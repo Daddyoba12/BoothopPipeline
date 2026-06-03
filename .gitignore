@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+temp/
+output/
+music/daily/*.mp3
+audio/trending/*.mp3
+data/audio_log.json
+data/used_music.json
+data/post_log.json

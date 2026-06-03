@@ -1,0 +1,108 @@
+{
+  "applied_at": "2026-06-03T00:00:00",
+  "gap_keywords": ["african", "nigerian", "nigeria", "diaspora", "foodstuffs", "shipping", "british", "relatable"],
+  "top_viral_hooks": [
+    "He built the biggest African restaurant in the world — story of a diaspora dream",
+    "Nigerian foodstuffs from London — she sends every week, her family eats every week",
+    "African diaspora running on trust. Real people. Real deliveries."
+  ],
+  "pov_pct_target": 65,
+  "hint": "Mix POV with direct statements and story angles. Use keywords: african, nigerian, diaspora, foodstuffs. Target 65% POV, 35% statement/story format.",
+  "week_ending": "2026-06-01",
+  "ig_stats": {
+    "total": 3,
+    "avg_likes": 0.7,
+    "avg_comments": 0.0,
+    "top_posts": [
+      {
+        "caption": "BootHop — discover hostels near you #travel #boothop #hostel",
+        "likes": 2,
+        "comments": 0,
+        "type": "VIDEO",
+        "timestamp": "2026-05-28T15:11:09+0000"
+      },
+      {
+        "caption": "POV: important docs? carried sharp-sharp — Lagos to Frankfurt 📄⚡\n\nWhen production cannot stop, movement matters.\n\nTruste",
+        "likes": 0,
+        "comments": 0,
+        "type": "VIDEO",
+        "timestamp": "2026-06-01T08:57:28+0000"
+      },
+      {
+        "caption": "POV: Diaspora love language = \"I'm sending something.\" ❤️\n\nBuilt for a world already in motion.\n\nBook your first deliver",
+        "likes": 0,
+        "comments": 0,
+        "type": "VIDEO",
+        "timestamp": "2026-05-29T15:00:28+0000"
+      }
+    ],
+    "best_day": "Thursday",
+    "day_engagement": {
+      "Monday": 0,
+      "Friday": 0,
+      "Thursday": 2
+    }
+  },
+  "li_stats": {
+    "total": 0,
+    "avg_likes": 0.0,
+    "avg_comments": 0.0,
+    "top_posts": []
+  },
+  "winning_patterns": [
+    {
+      "pattern": "pov_hook",
+      "count": 2
+    },
+    {
+      "pattern": "diaspora_angle",
+      "count": 2
+    }
+  ],
+  "music_summary": {
+    "total": 28,
+    "sources": {
+      "archive": 19,
+      "nigeria": 7,
+      "uk_grind_search": 2
+    },
+    "top_source": "archive",
+    "tracks": [
+      {
+        "title": "track_43",
+        "source": "archive"
+      },
+      {
+        "title": "track_40",
+        "source": "archive"
+      },
+      {
+        "title": "track_44",
+        "source": "archive"
+      },
+      {
+        "title": "track_45",
+        "source": "archive"
+      },
+      {
+        "title": "track_46",
+        "source": "archive"
+      },
+      {
+        "title": "track_47",
+        "source": "archive"
+      },
+      {
+        "title": "track_48",
+        "source": "archive"
+      }
+    ]
+  },
+  "pipeline_runs": 3,
+  "post_log_entries": 6,
+  "recommendations": {
+    "prioritise_pattern": "pov_hook",
+    "best_posting_day": "Thursday",
+    "music_priority": "archive"
+  }
+}
