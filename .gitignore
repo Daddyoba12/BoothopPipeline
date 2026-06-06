@@ -2,10 +2,27 @@ __pycache__/
 *.pyc
 *.pyo
 .env
+.claude/
+
+# credentials — never push tokens
+scripts/social_credentials.json
+scripts/youtube_token.json
+scripts/youtube_credentials.json
+config.py
+
+# generated/runtime files
 temp/
+temp_li/
 output/
+clips/
+voice/
+print/
+diagnostics/
+tiktok_demo/
 music/daily/*.mp3
 audio/trending/*.mp3
 data/audio_log.json
 data/used_music.json
 data/post_log.json
+data/cache/
+data/pipeline_crash.log
