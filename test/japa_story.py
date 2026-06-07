@@ -520,10 +520,17 @@ def render(clips: list[Path | None], audio: Path | None) -> bool:
         f":enable='gte(t,32.5)'"
     )
     draw.append(
-        f"drawtext=fontfile='{FONT_BODY}':text='info@boothop.com  |  +44 115 661 2825'"
+        f"drawtext=fontfile='{FONT_BODY}':text='info@boothop.com'"
         f":fontsize=28:fontcolor=white@0.88"
         f":borderw=2:bordercolor=black@0.80"
-        f":x=(w-text_w)/2:y=h-180"
+        f":x=(w-text_w)/2:y=h-210"
+        f":enable='gte(t,32.5)'"
+    )
+    draw.append(
+        f"drawtext=fontfile='{FONT_BOLD}':text='WhatsApp  +44 7405 746302'"
+        f":fontsize=28:fontcolor=#25D366"
+        f":borderw=2:bordercolor=black@0.80"
+        f":x=(w-text_w)/2:y=h-168"
         f":enable='gte(t,32.5)'"
     )
     draw.append(

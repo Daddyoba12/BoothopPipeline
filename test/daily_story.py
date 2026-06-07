@@ -861,7 +861,7 @@ def render(story: dict, clips: list[Path | None], audio: Path | None) -> Path | 
         f":x=(w-text_w)/2:y=h-210:enable='gte(t,32.5)'"
     )
     draw.append(
-        f"drawtext=fontfile='{FONT_BOLD}':text='WhatsApp  +44 115 661 2825'"
+        f"drawtext=fontfile='{FONT_BOLD}':text='WhatsApp  +44 7405 746302'"
         f":fontsize=27:fontcolor=#25D366"
         f":borderw=2:bordercolor=black@0.80"
         f":x=(w-text_w)/2:y=h-170:enable='gte(t,32.5)'"

@@ -507,10 +507,17 @@ def render(clips: list[Path], audio: Path | None, beat_cuts: list[float]) -> boo
         f":enable='between(t,32.5,{TOTAL_DUR})'"
     )
     draw.append(
-        f"drawtext=fontfile='{FONT_BODY}':text='info@boothop.com  |  +44 115 661 2825'"
-        f":fontsize=30:fontcolor=white@0.88"
+        f"drawtext=fontfile='{FONT_BODY}':text='info@boothop.com'"
+        f":fontsize=28:fontcolor=white@0.88"
         f":borderw=2:bordercolor=black@0.80"
-        f":x=(w-text_w)/2:y=h-176"
+        f":x=(w-text_w)/2:y=h-205"
+        f":enable='between(t,32.5,{TOTAL_DUR})'"
+    )
+    draw.append(
+        f"drawtext=fontfile='{FONT_BOLD}':text='WhatsApp  +44 7405 746302'"
+        f":fontsize=28:fontcolor=#25D366"
+        f":borderw=2:bordercolor=black@0.80"
+        f":x=(w-text_w)/2:y=h-165"
         f":enable='between(t,32.5,{TOTAL_DUR})'"
     )
     draw.append(
