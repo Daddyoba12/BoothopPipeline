@@ -46,12 +46,31 @@ except Exception:
     pass
 
 # Crash log — captures unhandled exceptions even when running headless as SYSTEM
-_LOG_FILE = Path(r"C:\Users\babso\Desktop\BootHopPipeline\data\pipeline_crash.log")
+_LOG_FILE  = Path(r"C:\Users\babso\Desktop\BootHopPipeline\data\pipeline_crash.log")
+_STEP_FILE = Path(r"C:\Users\babso\Desktop\BootHopPipeline\data\pipeline_step.txt")
 
 def _write_crash(msg: str):
     try:
         with open(_LOG_FILE, "a", encoding="utf-8", errors="replace") as _f:
             _f.write(f"\n[{datetime.now().isoformat()}] {msg}\n")
+    except Exception:
+        pass
+
+def _set_step(step: str):
+    """Overwrite step file with current step + timestamp.
+    If the process is killed externally (e.g. battery cutoff via Task Scheduler),
+    the next run reads this to report which step was running at time of death."""
+    try:
+        _STEP_FILE.write_text(
+            f"[{datetime.now().isoformat()}] {step}", encoding="utf-8"
+        )
+    except Exception:
+        pass
+
+def _clear_step():
+    try:
+        if _STEP_FILE.exists():
+            _STEP_FILE.unlink()
     except Exception:
         pass
 
@@ -105,6 +124,21 @@ FONT = FONT_TITLE  # legacy alias
 PEXELS_KEY  = "NY3tWysBJseeky8V1JEp2YjevIq6MTYcOCfuKNBU7iypjC7Qc5T1DTp5"
 TELEGRAM_TOKEN   = "8717698733:AAF7GI9Yw1DhdYVv_TK35fYQcwaGdk4caeA"
 TELEGRAM_CHAT_ID = "8641867751"
+
+# WhatsApp Cloud API — operator number +44-7405-746302 receives all pipeline alerts
+WHATSAPP_ACCESS_TOKEN    = ""   # set in .env: WHATSAPP_ACCESS_TOKEN=...
+WHATSAPP_PHONE_NUMBER_ID = ""   # set in .env: WHATSAPP_PHONE_NUMBER_ID=...
+WHATSAPP_RECIPIENT       = "447405746302"  # operator's WhatsApp (no +)
+
+# Load .env for WHATSAPP_* tokens
+_env_path = BASE / ".env"
+if _env_path.exists():
+    for _line in _env_path.read_text(encoding="utf-8").splitlines():
+        if "=" in _line and not _line.startswith("#"):
+            _k, _v = _line.split("=", 1)
+            _k, _v = _k.strip(), _v.strip()
+            if _k == "WHATSAPP_ACCESS_TOKEN":    WHATSAPP_ACCESS_TOKEN    = _v
+            if _k == "WHATSAPP_PHONE_NUMBER_ID": WHATSAPP_PHONE_NUMBER_ID = _v
 
 # ── Social posting modules ─────────────────────────────────────────────────────
 SCRIPTS = BASE / "scripts"
@@ -422,13 +456,13 @@ BUCKET_QUERIES = {
         "african mother door gift surprised emotional",
         "woman unwraps gift tears happy living room",
         "black family hug reunion home front door",
-        "mother daughter kitchen laughing together",
+        "woman holds parcel box door smiling emotional",
         "hands hold gift box ribbon presentation",
-        "elderly woman gift birthday candles family",
+        "elderly woman receives parcel door surprised",
         "african family video call phone smiling",
-        "child runs hugs parent returning home",
+        "child runs hugs parent returning home luggage",
         "woman reads message phone crying happy",
-        "family gather table celebration home meal",
+        "family living room unbox parcel together",
         "mother opens parcel box reveals gift",
         "young woman sends gift flowers thoughtful",
         "grandma opens birthday present emotional",
@@ -503,13 +537,13 @@ BUCKET_QUERIES = {
         "group friends unbox parcel together living room",
         "diaspora friends reunion hug airport arrivals",
         "african grandmother grandchildren home",
-        "street food vendor customer exchange nigeria",
+        "nigerian community handover parcel doorstep",
         "church community gathering nigeria",
         "family WhatsApp video call group reaction",
         "aunty receives surprise gift door laughing",
         "cousins open package together bedroom",
         "young nigerians london gathering friends",
-        "african family christmas gifts living room",
+        "african family celebration home gathering",
     ],
 }
 
@@ -1252,10 +1286,19 @@ def download_clips(hook, bucket, count=8, prefix="", exclude_queries=None):
     recent_vid_ids = _recently_used_ids(is_photo=False)
     recent_img_ids = _recently_used_ids(is_photo=True)
 
+    # Load permanent blocklist — IDs banned from all BootHop content
+    try:
+        from scripts.media_blocklist import blocked_video_ids as _bv, blocked_photo_ids as _bp
+        _blocked_vids   = _bv()
+        _blocked_photos = _bp()
+    except Exception:
+        _blocked_vids, _blocked_photos = set(), set()
+
     def _fresh_video(vids: list) -> dict | None:
-        """Pick a video not used in the last 14 days. Falls back to any if all used."""
-        fresh = [v for v in vids if v.get("id") not in recent_vid_ids]
-        pool  = fresh if fresh else vids
+        """Pick a video not used in the last 14 days and not on the blocklist."""
+        allowed = [v for v in vids if int(v.get("id", 0)) not in _blocked_vids]
+        fresh   = [v for v in allowed if v.get("id") not in recent_vid_ids]
+        pool    = fresh if fresh else allowed
         return random.choice(pool) if pool else None
 
     def _try_photo_fallback(query: str, dest: Path) -> bool:
@@ -1266,8 +1309,9 @@ def download_clips(hook, bucket, count=8, prefix="", exclude_queries=None):
         try:
             res    = requests.get(url, headers=headers, timeout=15).json()
             photos = res.get("photos", [])
-            fresh  = [p for p in photos if p.get("id") not in recent_img_ids]
-            pool   = fresh if fresh else photos
+            allowed = [p for p in photos if int(p.get("id", 0)) not in _blocked_photos]
+            fresh  = [p for p in allowed if p.get("id") not in recent_img_ids]
+            pool   = fresh if fresh else allowed
             if not pool:
                 return False
             photo  = random.choice(pool)
@@ -2223,6 +2267,55 @@ def send_telegram_video(video_path, caption, label):
         print(f"  Telegram {label} failed: {e}")
 
 
+def send_telegram_video_approval(video_path: str, caption: str) -> bool:
+    """
+    Send a preview video to Telegram WITH the approval keyboard attached.
+    User sees the actual content + can tap approve/delay/ignore in one message.
+    Falls back to text-only keyboard if video send fails.
+    """
+    markup = {"inline_keyboard": [
+        [
+            {"text": "✅ Post All V1",   "callback_data": "all_v1"},
+            {"text": "✅ Post All V2",   "callback_data": "all_v2"},
+            {"text": "⏰ Post in 1hr",   "callback_data": "delay_1hr"},
+        ],
+        [
+            {"text": "TikTok V1",        "callback_data": "tt_v1"},
+            {"text": "TikTok V2",        "callback_data": "tt_v2"},
+            {"text": "TikTok Skip",      "callback_data": "tt_skip"},
+        ],
+        [
+            {"text": "IG V1",            "callback_data": "ig_v1"},
+            {"text": "IG V2",            "callback_data": "ig_v2"},
+            {"text": "IG Skip",          "callback_data": "ig_skip"},
+        ],
+        [
+            {"text": "🚫 Ignore — post nothing", "callback_data": "ignore_all"},
+        ],
+    ]}
+    try:
+        with open(video_path, "rb") as f:
+            r = requests.post(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendVideo",
+                data={
+                    "chat_id": TELEGRAM_CHAT_ID,
+                    "caption": caption[:1024],
+                    "parse_mode": "Markdown",
+                    "reply_markup": json.dumps(markup),
+                },
+                files={"video": f},
+                timeout=180,
+            )
+        if r.ok and r.json().get("ok"):
+            print("  [Approval] Video preview + keyboard sent to Telegram")
+            return True
+        print(f"  [Approval] Video send failed: {r.text[:120]} — falling back to text keyboard")
+        return False
+    except Exception as e:
+        print(f"  [Approval] Video send error: {e} — falling back to text keyboard")
+        return False
+
+
 def send_telegram_text(text):
     try:
         requests.post(
@@ -2235,18 +2328,66 @@ def send_telegram_text(text):
         print(f"  Caption send failed: {e}")
 
 
-def send_telegram_approval_request():
+def send_whatsapp_text(text: str):
+    """Send a plain-text notification to the operator's WhatsApp (+44-7405-746302).
+    Runs alongside Telegram — both channels stay active."""
+    if not WHATSAPP_ACCESS_TOKEN or not WHATSAPP_PHONE_NUMBER_ID:
+        return
+    try:
+        requests.post(
+            f"https://graph.facebook.com/v18.0/{WHATSAPP_PHONE_NUMBER_ID}/messages",
+            headers={
+                "Authorization": f"Bearer {WHATSAPP_ACCESS_TOKEN}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "messaging_product": "whatsapp",
+                "to": WHATSAPP_RECIPIENT,
+                "type": "text",
+                "text": {"body": text[:4096]},
+            },
+            timeout=20,
+        )
+    except Exception as e:
+        print(f"  [WhatsApp notify] {e}")
+
+
+def check_whatsapp_approval(approval_id: str) -> str | None:
+    """
+    Poll Vercel /api/pipeline-decision for a WhatsApp reply decision.
+    Returns: 'all_v1' | 'all_v2' | 'tt_ig' | 'ignore' | 'tt_v1' | 'tt_v2' |
+             'ig_v1' | 'ig_v2' | None (no reply yet)
+    approval_id is ignored — endpoint always returns the oldest unprocessed decision.
+    """
+    try:
+        r = requests.get(
+            "https://boothop.com/api/pipeline-decision",
+            headers={"x-pipeline-secret": "boothop_pipeline_secret_2026"},
+            timeout=10,
+        )
+        if r.ok:
+            data = r.json()
+            return data.get("decision") or None
+    except Exception:
+        pass
+    return None
+
+
+def send_telegram_approval_request(approval_id: str):
     """
     Send per-platform approval keyboard to Telegram.
+    Approval ID is embedded so WhatsApp bridge can also route replies.
 
     Row 1 (quick): Post All V1 | Post All V2 | Ignore
-    Rows 2-5:      TikTok / Instagram / YouTube / LinkedIn  with V1 | V2 | Skip each
+    Rows 2-3:      TikTok / Instagram  with V1 | V2 | Skip each
+    YouTube auto-follows TikTok. LinkedIn runs separately.
+    Ignore overrides 90-min auto-post — nothing posts.
     """
     markup = json.dumps({"inline_keyboard": [
         [
-            {"text": "Post All V1",  "callback_data": "all_v1"},
-            {"text": "Post All V2",  "callback_data": "all_v2"},
-            {"text": "Ignore",       "callback_data": "ignore_all"},
+            {"text": "Post All V1",   "callback_data": "all_v1"},
+            {"text": "Post All V2",   "callback_data": "all_v2"},
+            {"text": "⏰ Post in 1hr", "callback_data": "delay_1hr"},
         ],
         [
             {"text": "TikTok V1",    "callback_data": "tt_v1"},
@@ -2259,14 +2400,8 @@ def send_telegram_approval_request():
             {"text": "IG Skip",      "callback_data": "ig_skip"},
         ],
         [
-            {"text": "YT V1",        "callback_data": "yt_v1"},
-            {"text": "YT V2",        "callback_data": "yt_v2"},
-            {"text": "YT Skip",      "callback_data": "yt_skip"},
-        ],
-        [
-            {"text": "LI V1",        "callback_data": "li_v1"},
-            {"text": "LI V2",        "callback_data": "li_v2"},
-            {"text": "LI Skip",      "callback_data": "li_skip"},
+            {"text": "📖 IG = Story",  "callback_data": "ig_story"},
+            {"text": "🚫 Ignore",      "callback_data": "ignore_all"},
         ],
     ]})
     try:
@@ -2275,11 +2410,13 @@ def send_telegram_approval_request():
             json={
                 "chat_id": TELEGRAM_CHAT_ID,
                 "text": (
-                    "*Ready to post — your call:*\n\n"
-                    "Top row = all platforms at once.\n"
-                    "Rows 2-5 = choose per platform independently.\n"
-                    "*Ignore* = nothing posts, timeout auto-post also disabled.\n\n"
-                    "_No reply in 90 min = V1 auto-posts everywhere._"
+                    "*Content ready — your call:*\n\n"
+                    "Row 1: Post same version to all platforms now, or delay 1hr.\n"
+                    "Rows 2-3: Choose per platform independently.\n"
+                    "YouTube auto-follows TikTok.\n"
+                    "⏰ *Post in 1hr* = posts at prime time (still in the 7-9am window).\n"
+                    "🚫 *Ignore* = nothing posts today.\n\n"
+                    "_No reply in 60 min = TikTok V1, Instagram V2, YouTube V1 auto-post._"
                 ),
                 "parse_mode": "Markdown",
                 "reply_markup": markup,
@@ -2297,19 +2434,67 @@ def send_telegram_approval_request():
         return None
 
 
-def wait_for_approval(timeout_seconds=5400):
+def wait_for_approval(approval_id: str, timeout_seconds=3600):
     """
-    Long-poll Telegram for approval callbacks. Supports per-platform choices.
+    Polls BOTH Telegram (inline keyboard) and WhatsApp (bridge file) for approval.
+
+    Telegram: real-time inline keyboard callbacks (active now).
+    WhatsApp:  reads DATA/whatsapp_approvals.json written by the webhook bridge (stub — ready to wire).
 
     Returns dict:
         {
             "tiktok":    "v1" | "v2" | "skip" | None,
             "instagram": "v1" | "v2" | "skip" | None,
-            "youtube":   "v1" | "v2" | "skip" | None,
-            "ignore":    True | False,
+            "ignore":    True | False,   ← Ignore cancels 90-min auto-post
         }
-    None means platform was not explicitly set — posting logic defaults it to v1.
+    None = not explicitly set → posting logic applies platform default.
+    ignore=True → nothing posts, 90-min auto is suppressed.
     """
+    _CB_MAP = {
+        "all_v1":     ("all",       "v1"),
+        "all_v2":     ("all",       "v2"),
+        "ignore_all": ("all",       "ignore"),
+        "delay_1hr":  ("all",       "delay"),
+        "tt_v1":      ("tiktok",    "v1"),
+        "tt_v2":      ("tiktok",    "v2"),
+        "tt_skip":    ("tiktok",    "skip"),
+        "ig_v1":      ("instagram", "v1"),
+        "ig_v2":      ("instagram", "v2"),
+        "ig_skip":    ("instagram", "skip"),
+        "ig_story":   ("instagram", "story"),
+        "choose_v1":  ("all",       "v1"),
+        "choose_v2":  ("all",       "v2"),
+    }
+
+    def _apply(choices, cb_data):
+        """Apply a callback decision to the choices dict. Returns confirmed=True if terminal."""
+        if cb_data not in _CB_MAP:
+            return False
+        platform, version = _CB_MAP[cb_data]
+        if platform == "all":
+            if version == "ignore":
+                choices["ignore"] = True
+            elif version == "delay":
+                choices["delay"] = True
+            else:
+                choices["tiktok"]    = version
+                choices["instagram"] = version
+            return True
+        else:
+            choices[platform] = version
+            return False  # per-platform — keep waiting for other platforms
+
+    def _ack_telegram(cb_id, text="Got it!"):
+        try:
+            requests.post(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/answerCallbackQuery",
+                json={"callback_query_id": cb_id, "text": text},
+                timeout=10,
+            )
+        except Exception:
+            pass
+
+    # Drain stale Telegram updates before starting
     try:
         drain = requests.get(
             f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/getUpdates",
@@ -2321,42 +2506,22 @@ def wait_for_approval(timeout_seconds=5400):
     except Exception:
         offset = 0
 
-    choices   = {"tiktok": None, "instagram": None, "youtube": None, "linkedin": None, "ignore": False}
+    choices   = {"tiktok": None, "instagram": None, "ignore": False, "delay": False}
     deadline  = datetime.now().timestamp() + timeout_seconds
     confirmed = False
 
-    _CB_MAP = {
-        "all_v1":     ("all",       "v1"),
-        "all_v2":     ("all",       "v2"),
-        "ignore_all": ("all",       "ignore"),
-        "tt_v1":      ("tiktok",    "v1"),
-        "tt_v2":      ("tiktok",    "v2"),
-        "tt_skip":    ("tiktok",    "skip"),
-        "ig_v1":      ("instagram", "v1"),
-        "ig_v2":      ("instagram", "v2"),
-        "ig_skip":    ("instagram", "skip"),
-        "yt_v1":      ("youtube",   "v1"),
-        "yt_v2":      ("youtube",   "v2"),
-        "yt_skip":    ("youtube",   "skip"),
-        "li_v1":      ("linkedin",  "v1"),
-        "li_v2":      ("linkedin",  "v2"),
-        "li_skip":    ("linkedin",  "skip"),
-        "choose_v1":  ("all",       "v1"),
-        "choose_v2":  ("all",       "v2"),
-    }
+    print(f"  [Approval] Waiting up to {timeout_seconds // 60}min — Telegram + WhatsApp (id={approval_id})")
 
-    def _ack(cb_id, text="Got it!"):
-        try:
-            requests.post(
-                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/answerCallbackQuery",
-                json={"callback_query_id": cb_id, "text": text},
-                timeout=10,
-            )
-        except Exception:
-            pass
-
-    print(f"  [Approval] Waiting up to {timeout_seconds}s for Telegram response...")
     while datetime.now().timestamp() < deadline and not confirmed:
+        # ── WhatsApp bridge check (runs every poll cycle) ──────────────────────
+        wa_decision = check_whatsapp_approval(approval_id)
+        if wa_decision:
+            confirmed = _apply(choices, wa_decision)
+            print(f"  [Approval/WA] Received: {wa_decision} → choices={choices}")
+            if confirmed:
+                break
+
+        # ── Telegram long-poll ─────────────────────────────────────────────────
         remaining = deadline - datetime.now().timestamp()
         wait = int(min(30, remaining))
         if wait <= 0:
@@ -2373,34 +2538,32 @@ def wait_for_approval(timeout_seconds=5400):
             continue
 
         for upd in resp.get("result", []):
-            offset    = upd["update_id"] + 1
-            cb        = upd.get("callback_query", {})
-            cb_data   = cb.get("data", "")
+            offset  = upd["update_id"] + 1
+            cb      = upd.get("callback_query", {})
+            cb_data = cb.get("data", "")
             if cb_data not in _CB_MAP:
                 continue
+            terminal = _apply(choices, cb_data)
             platform, version = _CB_MAP[cb_data]
-            if platform == "all":
-                if version == "ignore":
-                    choices["ignore"] = True
-                    _ack(cb["id"], "Noted — nothing will post.")
-                    confirmed = True
-                else:
-                    for p in ("tiktok", "instagram", "youtube", "linkedin"):
-                        choices[p] = version
-                    _ack(cb["id"], f"All platforms set to {version.upper()}!")
-                    confirmed = True
+            if version == "ignore":
+                _ack_telegram(cb["id"], "🚫 Ignored — nothing will post today.")
+            elif version == "delay":
+                _ack_telegram(cb["id"], "⏰ Got it — posting in 60 min, right in prime time.")
+            elif platform == "all":
+                _ack_telegram(cb["id"], f"✅ All platforms → {version.upper()} — posting now!")
             else:
-                choices[platform] = version
-                _ack(cb["id"], f"{platform.capitalize()} = {version.upper()}")
-                print(f"  [Approval] {platform} = {version}")
+                _ack_telegram(cb["id"], f"✅ {platform.capitalize()} → {version.upper()}")
+            print(f"  [Approval/TG] {cb_data} → choices={choices}")
+            if terminal:
+                confirmed = True
+                break
 
-    if not confirmed and not choices["ignore"]:
-        for p in ("tiktok", "instagram", "youtube", "linkedin"):
-            if choices[p] is None:
-                choices[p] = "v1"
-        print(f"  [Approval] Timed out — defaulting unset platforms to V1")
-    else:
-        print(f"  [Approval] Final choices: {choices}")
+    # ── Timeout handling ───────────────────────────────────────────────────────
+    if not confirmed:
+        if choices["ignore"]:
+            print("  [Approval] Ignore was set — suppressing auto-post")
+        else:
+            print("  [Approval] Timed out — platform defaults will apply")
 
     return choices
 
@@ -2769,6 +2932,7 @@ def main():
     out_dir.mkdir(parents=True, exist_ok=True)
     cleanup_old_outputs()
 
+    _set_step("init: bucket/music/theme")
     bucket = get_adjusted_bucket()
     music_v1, music_v2 = get_music()
     theme_idx, theme = get_weekly_theme()
@@ -2777,10 +2941,12 @@ def main():
     print(f"  Posting  : TikTok Reel  |  Instagram Reel  |  YouTube Short")
 
     # ── VERSION 1 ──────────────────────────────────────────────────────────────
+    _set_step("V1: pick_content")
     print(f"\n[V1] Selecting hook...")
     hook1, eng1 = pick_content(bucket)
     print(f"  Hook: {hook1[:70]}")
 
+    _set_step("V1: download_clips")
     print(f"\n[V1] Downloading clips...")
     clips1, queries1 = download_clips(hook1, bucket, count=8, prefix="v1_")
     if len(clips1) < 2:
@@ -2789,14 +2955,17 @@ def main():
 
     base1 = TEMP / "base_v1.mp4"
     if clips1:
+        _set_step("V1: process_clips")
         print(f"\n[V1] Processing clips...")
         process_clips(clips1, base1, prefix="v1_")
 
     # ── VERSION 2 ──────────────────────────────────────────────────────────────
+    _set_step("V2: pick_content")
     print(f"\n[V2] Selecting hook (different narrative)...")
     hook2, eng2 = pick_content(bucket, exclude=[hook1])
     print(f"  Hook: {hook2[:70]}")
 
+    _set_step("V2: download_clips")
     print(f"\n[V2] Downloading clips (different scenes from V1)...")
     clips2, queries2 = download_clips(hook2, bucket, count=8, prefix="v2_", exclude_queries=queries1)
     if len(clips2) < 2:
@@ -2805,10 +2974,12 @@ def main():
 
     base2 = TEMP / "base_v2.mp4"
     if clips2:
+        _set_step("V2: process_clips")
         print(f"\n[V2] Processing clips...")
         process_clips(clips2, base2, prefix="v2_")
 
     # ── RENDER 2 VIDEOS (V1 + V2, one music track each) ───────────────────────
+    _set_step("render: building videos")
     print(f"\n[RENDER] Building videos...")
     all_videos = []  # (path, label, caption)
     hero1, hero2, caption1, caption2 = "", "", "", ""
@@ -2828,43 +2999,50 @@ def main():
         save_used(hook2, eng2)
 
     # ── TELEGRAM ───────────────────────────────────────────────────────────────
+    _set_step("telegram: sending videos")
     print(f"\n[TELEGRAM] Sending {len(all_videos)} videos...")
     if not all_videos:
-        send_telegram_text(
-            f"⚠️ *PIPELINE RAN BUT NO VIDEOS RENDERED*\n"
+        _alert = (
+            f"⚠️ PIPELINE RAN BUT NO VIDEOS RENDERED\n"
             f"📅 {datetime.now().strftime('%A %d %B  %H:%M')}\n"
             f"Check pipeline logs — render_video() likely failed.\n"
             f"Clips1 ready: {bool(clips1 and base1.exists())} | Clips2 ready: {bool(clips2 and base2.exists())}"
         )
+        send_telegram_text(_alert)
+        send_whatsapp_text(_alert)
         return
 
     for path, label, caption in all_videos:
         send_telegram_video(path, caption, label)
 
-    # Send caption summary with platform split labels
+    # Daily plan + content briefing — sent to Telegram + WhatsApp before approval keyboard
     theme_idx, theme = get_weekly_theme()
-    summary_parts = [
-        f"🎬 *DAILY PIPELINE COMPLETE*\n"
-        f"📅 {datetime.now().strftime('%A %d %B  %H:%M')}\n"
-        f"🪣 Bucket: {bucket.upper()}  |  📖 Theme (Wk{theme_idx+1}/4): {theme['name']}\n\n"
-        f"📲 *PLATFORMS THIS VIDEO GOES TO:*\n"
-        f"  • TikTok — Reel (via approval)\n"
-        f"  • Instagram — Reel (via approval)\n"
-        f"  • YouTube — Short (auto-uploads now)\n"
-        f"  • Stories — 1pm + 8:30pm (separate task)\n"
-    ]
+    _auto_post_str = (datetime.now() + timedelta(minutes=60)).strftime("%H:%M")
+
+    _plan = (
+        f"📅 *BOOTHOP DAILY PLAN — {datetime.now().strftime('%A %d %B  %H:%M')}*\n"
+        f"🪣 *{bucket.upper()}* bucket  ·  Theme Wk{theme_idx+1}/4: _{theme['name']}_\n\n"
+        f"*WHAT'S POSTING TODAY:*\n"
+        f"  ~{_auto_post_str}  🎬 TikTok — Reel V1 (library music)\n"
+        f"  ~{_auto_post_str}  🎬 Instagram — Reel V2 (trending music)\n"
+        f"  ~{_auto_post_str}  📺 YouTube — Short (follows TikTok)\n"
+        f"  12:00     🖼️  Instagram — Carousel (auto)\n\n"
+        f"*TODAY'S CONTENT:*\n"
+    )
     if clips1:
-        summary_parts.append(f"\nV1 Hook: {hook1}")
+        _plan += f"  V1 → _{hook1[:70]}_\n"
     if clips2:
-        summary_parts.append(f"\nV2 Hook: {hook2}")
-    summary_parts.append(f"\n\n--- V1 Caption (TikTok/IG/YT) ---\n{caption1 if clips1 else 'N/A'}")
-    summary_parts.append(f"\n\n--- V2 Caption (TikTok/IG/YT) ---\n{caption2 if clips2 else 'N/A'}")
-    send_telegram_text("".join(summary_parts)[:4096])
+        _plan += f"  V2 → _{hook2[:70]}_\n"
+    _plan += f"\n⏱ _Approve below within 60 min or auto-posts at {_auto_post_str}._"
+
+    send_telegram_text(_plan)
+    send_whatsapp_text(_plan)
 
     # ── YOUTUBE ────────────────────────────────────────────────────────────────
     # Day alternation: odd day-of-year → V1, even day → V2
     # Non-English hooks: upload primary (local) version + English translation version
     # Naming: BootHop-BD0001A (primary/local), BootHop-BD0001a (English translation)
+    _set_step("youtube: preparing upload")
     print(f"\n[YOUTUBE] Preparing upload...")
     day_of_year  = datetime.now().timetuple().tm_yday
     use_v1       = (day_of_year % 2 == 1)   # odd days = V1, even days = V2
@@ -2913,6 +3091,31 @@ def main():
 
     soc_v1_path, soc_v1_caption = _find_social_video(1)
     soc_v2_path, soc_v2_caption = _find_social_video(2)
+
+    # ── Daily Story — generate alongside V1/V2 ────────────────────────────────
+    _story_path = None
+    try:
+        _story_script = BASE / "test" / "daily_story.py"
+        if _story_script.exists():
+            print("\n[STORY] Generating daily story reel...")
+            _sr = subprocess.run(
+                [sys.executable, str(_story_script)],
+                cwd=str(BASE), capture_output=True, text=True, timeout=420,
+            )
+            # Find output — daily_story_<name>.mp4
+            _story_candidates = sorted(
+                (BASE / "test").glob("daily_story_*.mp4"),
+                key=lambda p: p.stat().st_mtime, reverse=True,
+            )
+            if _story_candidates:
+                _story_path = str(_story_candidates[0])
+                print(f"  [STORY] Ready: {Path(_story_path).name}")
+            else:
+                print(f"  [STORY] Script ran but no output found")
+        else:
+            print("  [STORY] daily_story.py not found — skipping")
+    except Exception as _se:
+        print(f"  [STORY] Error generating story: {_se}")
 
     ig_ok = False  # track whether Instagram succeeded this run
     li_ok = False  # track whether LinkedIn succeeded this run
@@ -3021,21 +3224,106 @@ def main():
     elif not soc_v1_path and not soc_v2_path:
         print("\n[SOCIAL] No videos available for social posting.")
     else:
-        print(f"\n[SOCIAL] Sending approval request...")
-        send_telegram_approval_request()
-        choices = wait_for_approval(timeout_seconds=5400)   # 90-minute window
+        import random as _rand
+        _approval_id = _rand.randint(10000, 99999)
+        print(f"\n[SOCIAL] Sending approval request (id={_approval_id})...")
 
+        # Send preview video WITH approval keyboard so user sees content + buttons together
+        # Prefer V2 (trending music) as the preview; fall back to V1
+        _preview_path = soc_v2_path or soc_v1_path
+        _story_label  = f"\n*Story:* _{Path(_story_path).stem.replace('daily_story_','').replace('_',' ').title()}_" if _story_path else ""
+        _preview_caption = (
+            f"🎬 *PREVIEW — tap to approve*\n\n"
+            f"*V1:* _{hook1[:60]}_\n"
+            f"*V2:* _{hook2[:60]}_"
+            f"{_story_label}\n\n"
+            f"⏱ _Auto-posts at {_auto_post_str} if no reply._"
+        )
+        _video_sent = False
+        if _preview_path and Path(_preview_path).exists():
+            _video_sent = send_telegram_video_approval(_preview_path, _preview_caption)
+        if not _video_sent:
+            send_telegram_approval_request(str(_approval_id))
+
+        # Send story preview separately so user can see it before deciding
+        if _story_path and Path(_story_path).exists():
+            try:
+                _story_name = Path(_story_path).stem.replace("daily_story_","").replace("_"," ").title()
+                send_telegram_video_approval(
+                    _story_path,
+                    f"📖 *Today's Story Reel — {_story_name}*\n_Tap '📖 IG = Story' to post this to Instagram instead of V2._"
+                )
+                print("  [STORY] Preview sent to Telegram")
+            except Exception as _sp_e:
+                print(f"  [STORY] Preview send error: {_sp_e}")
+
+        # WhatsApp reply instructions
+        _story_wa = "\n  5 or STORY   - Instagram = story reel" if _story_path else ""
+        send_whatsapp_text(
+            "BootHop pipeline ready!\n\n"
+            "Reply to approve today's post:\n"
+            "  1 or TT      - TikTok only (V1)\n"
+            "  2 or IG      - Instagram only (V2)\n"
+            "  3 or BOTH    - Post to both\n"
+            f"  4 or SKIP    - Ignore, post nothing"
+            f"{_story_wa}\n\n"
+            "Or use Telegram for more options."
+        )
+
+        choices = wait_for_approval(str(_approval_id), timeout_seconds=3600)
+
+        # Handle ignore
         if choices.get("ignore"):
-            send_telegram_text("Ignore set — skipping all platforms.")
-        else:
-            # Post each platform with its chosen version (skip if "skip")
-            for _plat in ("tiktok", "instagram", "youtube", "linkedin"):
-                _ver = choices.get(_plat)   # "v1", "v2", "skip", or None (= v1 default)
-                if _ver == "skip":
-                    send_telegram_text(f"{_plat.capitalize()} skipped.")
-                    continue
-                _vnum = 2 if _ver == "v2" else 1
-                _post_platform(_plat, _vnum, f"V{_vnum}")
+            send_telegram_text("🚫 Pipeline ignored — nothing posted today.")
+            send_whatsapp_text("🚫 Pipeline ignored — nothing posted today.")
+            _clear_step()
+            return
+
+        # Handle delay — sleep 60 min then post with platform defaults
+        if choices.get("delay"):
+            _delay_post_time = (datetime.now() + timedelta(minutes=60)).strftime("%H:%M")
+            _delay_msg = f"⏰ Posting in 60 min at ~{_delay_post_time} — right in the 7-9am prime window."
+            send_telegram_text(_delay_msg)
+            send_whatsapp_text(_delay_msg)
+            print(f"  [Delay] Sleeping 60 min — will post at ~{_delay_post_time}")
+            time.sleep(3600)
+
+        # Default: TikTok=V1 (library, copyright-safe), Instagram=V2 (trending music)
+        # YouTube auto-follows TikTok's version — no separate approval needed
+        _platform_defaults = {"tiktok": 1, "instagram": 2}
+        _tt_version_used = None
+
+        for _plat in ("tiktok", "instagram"):
+            _ver = choices.get(_plat)
+            if _ver == "skip":
+                send_telegram_text(f"{_plat.capitalize()} skipped.")
+                continue
+            # Story reel — post daily_story.mp4 to Instagram instead of V1/V2
+            if _ver == "story" and _plat == "instagram" and _story_path and Path(_story_path).exists():
+                print(f"\n[Instagram] Posting daily story reel: {Path(_story_path).name}")
+                try:
+                    _story_caption = (
+                        "Which route are you doing next? Drop it below 👇\n\n"
+                        "#BootHop #EarnWhileYouTravel #NaijaUK #JapaToJapada #TrustedTraveller"
+                    )
+                    post_instagram_reel(_story_path, _story_caption)
+                    ig_ok = True
+                    send_telegram_text("✅ Instagram — Story Reel posted!")
+                    _log_post("instagram_story", "daily_story_reel", bucket, "story")
+                except Exception as _st_e:
+                    send_telegram_text(f"❌ Instagram Story post failed: {_st_e}")
+                    print(f"  [Instagram Story] Error: {_st_e}")
+                continue
+            _vnum = 2 if _ver == "v2" else (1 if _ver == "v1" else _platform_defaults[_plat])
+            _post_platform(_plat, _vnum, f"V{_vnum}")
+            if _plat == "tiktok":
+                _tt_version_used = _vnum
+
+        # YouTube follows TikTok automatically
+        if choices.get("tiktok") != "skip":
+            _yt_vnum = _tt_version_used if _tt_version_used else 1
+            print(f"\n[YOUTUBE] Auto-uploading V{_yt_vnum} (follows TikTok)...")
+            _do_youtube_upload(_yt_vnum, hook1 if _yt_vnum == 1 else hook2, hero1 if _yt_vnum == 1 else hero2)
 
     # ── STATUS / ACTION REQUIRED REPORT ───────────────────────────────────────
     try:
@@ -3080,7 +3368,8 @@ def main():
             "• Blog: check blog/pending/ folder for posts to publish"
         )
         send_telegram_text(status_block[:4096])
-        print(f"\n[STATUS] Report sent to Telegram.")
+        send_whatsapp_text(status_block[:4096])
+        print(f"\n[STATUS] Report sent to Telegram + WhatsApp.")
     except Exception as _st_e:
         print(f"  [STATUS] Failed to send status report: {_st_e}")
 
@@ -3095,6 +3384,7 @@ def main():
         json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8"
     )
 
+    _clear_step()
     print(f"\n{'='*58}")
     print(f"  Done! {len(all_videos)} videos sent to Telegram.")
     print(f"  Platform : {platform}  |  Bucket: {bucket}")
@@ -3105,7 +3395,30 @@ def main():
 
 
 if __name__ == "__main__":
-    import traceback
+    import traceback, atexit
+
+    # If a step file exists from a previous run, that run was killed externally
+    # (e.g. Task Scheduler stopped it due to battery). Log what it was doing.
+    if _STEP_FILE.exists():
+        try:
+            _last_step = _STEP_FILE.read_text(encoding="utf-8").strip()
+            _write_crash(f"PREV-RUN KILLED at step: {_last_step}")
+            try:
+                import requests as _req
+                _req.post(
+                    f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+                    data={"chat_id": TELEGRAM_CHAT_ID,
+                          "text": f"[pipeline.py] Previous run was killed externally.\nLast step: {_last_step}\n\nLikely cause: battery cutoff (StopIfGoingOnBatteries)."},
+                    timeout=10,
+                )
+            except Exception:
+                pass
+        except Exception:
+            pass
+        _clear_step()
+
+    atexit.register(_clear_step)  # clean up on normal or exception exit
+
     _write_crash(f"START — PID {os.getpid()}")
     try:
         main()
@@ -3113,14 +3426,14 @@ if __name__ == "__main__":
     except Exception as _top_exc:
         _tb = traceback.format_exc()
         _write_crash(f"CRASH:\n{_tb}")
-        # Also send to Telegram so you're notified even if headless
+        _clear_step()
         try:
             import requests as _req
             _req.post(
                 f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
                 data={"chat_id": TELEGRAM_CHAT_ID,
                       "text": f"[pipeline.py CRASH]\n{str(_top_exc)[:800]}\n\nFull trace: data/pipeline_crash.log"},
-                timeout=15
+                timeout=15,
             )
         except Exception:
             pass

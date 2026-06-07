@@ -15,6 +15,14 @@ from pathlib import Path
 BASE = Path(r"C:\Users\babso\Desktop\BootHopPipeline")
 DATA = BASE / "data"
 DATA.mkdir(exist_ok=True)
+sys.path.insert(0, str(BASE))
+
+def _get_yt_key():
+    try:
+        from config import YOUTUBE_API_KEY
+        return YOUTUBE_API_KEY
+    except Exception:
+        return ""
 
 
 # ── Trend fetching ─────────────────────────────────────────────────────────────
@@ -44,7 +52,7 @@ def fetch_youtube_trending_ng():
                 "chart": "mostPopular",
                 "regionCode": "NG",
                 "maxResults": 10,
-                "key": "AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY",  # public demo key — replace with your own
+                "key": _get_yt_key(),
             },
             timeout=10
         )
@@ -59,36 +67,72 @@ def fetch_youtube_trending_ng():
 # ── Hook template engine ───────────────────────────────────────────────────────
 
 HOOK_TEMPLATES_TREND = [
-    "POV: {trend} has the whole of Lagos buzzing and your aunty needs her {item} from London before the celebrations. BootHop gets it there same day.",
-    "POV: Everyone is talking about {trend}. You promised to send {item} in time. BootHop turns a traveller already going that way into your delivery.",
-    "POV: {trend} season is here. Your {family_member} in Lagos is waiting on {item} from the UK. One BootHop booking. Same day.",
-    "POV: Because of {trend}, the whole family is gathering. Your {item} from London needs to be there. BootHop makes it happen.",
-    "POV: {trend} energy is high right now. You have {item} to send. A trusted traveller is already going your way. That is BootHop.",
-    "POV: During {trend}, the last thing you need is a delayed package. BootHop uses real people already making the journey to deliver for you.",
-    "POV: {trend} has everyone buzzing. Your {family_member} needs {item} from London tonight. BootHop: trusted, same day, done.",
-    "POV: With {trend} happening, you finally have a reason to send that {item} you have been holding. BootHop gets it there today.",
+    # High energy — problem/solution
+    "POV: {trend} is everywhere. You have {item} sitting in London for your {family_member}. One verified traveller is already going. That is BootHop.",
+    "POV: It is {trend} season and your {family_member} is calling every hour. The {item} is in London. BootHop already found someone going today.",
+    "POV: {trend} week and you forgot to send {item} to Lagos. A BootHop traveller is at the airport RIGHT NOW. Book in 5 minutes.",
+    # Emotional
+    "POV: Your {family_member} has been waiting since January for that {item}. {trend} is the push you needed. BootHop gets it there today. No courier. Real person.",
+    "POV: {trend} is happening and your {family_member} in Lagos is watching everyone celebrate while YOUR package is still in London. Not anymore. BootHop.",
+    # Viral/funny
+    "POV: You told your {family_member} the {item} is coming for {trend}. You lied. Now BootHop has to save you. It will.",
+    "POV: Abroad life is real. {trend} hits different when your {family_member} can not enjoy it without the {item} you promised from London. BootHop, go.",
+    # Trust / proof
+    "POV: {trend} 2026. A real verified traveller carried my {family_member} {item} from London to Lagos in one day. That is BootHop. Not DHL. Not FedEx. A person.",
+    "POV: During {trend} someone trusted a stranger to carry mum {item} across two countries. Verified. Tracked. Delivered. That stranger was a BootHop traveller.",
 ]
 
 HOOK_TEMPLATES_MUSIC = [
-    "POV: {artist} just dropped and your sister needs the merch from London before the Lagos concert. BootHop delivers it the same day.",
-    "POV: Everyone in Lagos is vibing to {artist} right now. You have a gift to send. BootHop connects it to a traveller already going your way.",
-    "POV: {artist} energy is everywhere this week. Your mum asked for something special from the UK. BootHop makes it land today.",
-    "POV: The {artist} era is real. You promised your family something from London. BootHop turns that promise into a same-day delivery.",
+    "POV: {artist} is playing everywhere in Lagos. You are in London watching it live on Instagram. But the gift you promised is still here. BootHop. Send it today.",
+    "POV: {artist} just dropped and your people in Lagos are going crazy. You have been saying you will send {item}. A traveller leaves tonight. Book now. BootHop.",
+    "POV: {artist} era. Your whole family is in Lagos having the time of their lives and your {item} is still in your hallway in London. BootHop. Today.",
+    "POV: Everyone is vibing to {artist}. Your {family_member} asked for ONE thing from London. You have not sent it. A verified BootHop traveller is boarding in 3 hours.",
 ]
 
-FAMILY_MEMBERS = ["mum", "sister", "aunty", "grandma", "cousin", "dad", "brother"]
+FAMILY_MEMBERS = ["mum", "sister", "aunty", "grandma", "cousin", "dad", "brother", "wife", "baby"]
 ITEMS = [
     "Ankara fabric", "birthday gift", "designer bag", "medication",
     "phone", "spare parts", "anniversary gift", "shoes", "documents",
     "baby items", "wig", "laptop", "fashion items", "food parcel",
+    "jewellery", "small chops ingredients", "birthday cake topper",
 ]
 
-NIGERIA_FALLBACK_TRENDS = [
-    "AMVCA award season",    "Big Brother Naija finale",  "Super Eagles match",
-    "Lagos Fashion Week",    "Afrobeats festival season", "Detty December prep",
-    "NYSC camp season",      "Eid Mubarak celebrations",  "Christmas in Lagos",
-    "Naija Tech Week",       "Nollywood premiere",        "Valentine season Lagos",
-    "Mother's Day Nigeria",  "Nigerian election season",  "Easter celebrations",
+# Month-aware fallbacks — picks list matching current month
+import datetime as _dt_module
+_MONTH_TRENDS = {
+    1:  ["New Year Lagos parties", "January detox challenge", "Super Eagles AFCON"],
+    2:  ["Valentine season Lagos", "Afrobeats February", "Super Eagles qualifiers"],
+    3:  ["Holi Lagos", "March madness Nigeria", "Nollywood premiere"],
+    4:  ["Easter celebrations", "AMVCA award season", "Lagos Fashion Week"],
+    5:  ["Mother's Day Nigeria", "Afrobeats festival season", "Naija Tech Week"],
+    6:  ["Eid al-Adha celebrations", "Super Eagles match", "Detty June Lagos",
+         "Afrobeats summer season", "Japa movement Nigeria", "NYSC camp season",
+         "Big Brother Naija announcement", "Afropop summer Lagos"],
+    7:  ["Big Brother Naija premiere", "Lagos summer events", "Super Eagles match"],
+    8:  ["Independence Day prep Nigeria", "Detty August Lagos", "Big Brother Naija"],
+    9:  ["Nigerian Independence Month", "Afrobeats Grammy buzz", "Big Brother Naija"],
+    10: ["Detty October Lagos", "Nigerian Tech Week", "Halloween Lagos"],
+    11: ["Detty December prep", "Big Brother Naija finale", "Black Friday Lagos"],
+    12: ["Detty December Lagos", "Christmas in Lagos", "New Year countdown"],
+}
+_current_month = _dt_module.date.today().month
+NIGERIA_FALLBACK_TRENDS = _MONTH_TRENDS.get(_current_month, [
+    "Afrobeats festival season", "Super Eagles match", "Lagos Fashion Week",
+    "Naija Tech Week", "Nollywood premiere", "NYSC camp season",
+])
+
+# Sunday-specific high-energy hooks (injected when today is Sunday)
+SUNDAY_HOOKS = [
+    {"hook": "POV: It is Sunday. You are in London. Mum is in church in Lagos waiting for her package from you. A BootHop traveller already flew it over. She got it before service ended.",
+     "source": "sunday_special", "trend": "Sunday Naija vibes"},
+    {"hook": "POV: Sunday service in Lagos. Pastor says who has testimony? Your cousin stands up. My package from London arrived SAME DAY. That is BootHop testimony.",
+     "source": "sunday_special", "trend": "Sunday Things"},
+    {"hook": "POV: It is Sunday morning. The family WhatsApp is going crazy. The package you sent with a BootHop traveller reached Lagos overnight. You did not even know it landed.",
+     "source": "sunday_special", "trend": "Sunday Naija vibes"},
+    {"hook": "POV: Everyone is in their Sunday best in Lagos. Your aunty is wearing the wig you sent with a BootHop traveller on Friday. She is the most glamorous in church today.",
+     "source": "sunday_special", "trend": "Sunday Things"},
+    {"hook": "POV: Sunday afternoon. Jollof is on. Family is together. The shoes you sent from London with a BootHop traveller are already being shown off. Same day. Real person.",
+     "source": "sunday_special", "trend": "Sunday Naija vibes"},
 ]
 
 TRENDING_NIGERIAN_ARTISTS = [
@@ -169,7 +213,11 @@ def generate_music_trend_hooks():
     hooks = []
     for artist in artists:
         template = random.choice(HOOK_TEMPLATES_MUSIC)
-        hook = template.format(artist=artist)
+        hook = template.format(
+            artist=artist,
+            item=random.choice(ITEMS),
+            family_member=random.choice(FAMILY_MEMBERS),
+        )
         hooks.append({"hook": hook, "source": "music_trend", "trend": artist,
                        "generated": datetime.now().isoformat()})
     return hooks
@@ -263,12 +311,17 @@ def main():
         print(f"  {len(trends)} trends: {', '.join(trends[:6])}")
     else:
         print("  Using cultural fallbacks (pytrends unavailable)")
-        trends = random.sample(NIGERIA_FALLBACK_TRENDS, 10)
+        trends = random.sample(NIGERIA_FALLBACK_TRENDS, min(10, len(NIGERIA_FALLBACK_TRENDS)))
 
     # 2. Generate hooks
     trend_hooks = generate_hooks_from_trends(trends)
     music_hooks = generate_music_trend_hooks()
-    all_hooks   = trend_hooks + music_hooks
+    # Inject Sunday hooks when today is Sunday (weekday 6)
+    sunday_hooks = []
+    if datetime.now().weekday() == 6:
+        print("  Sunday detected — injecting Sunday Naija hooks")
+        sunday_hooks = [dict(h, generated=datetime.now().isoformat()) for h in SUNDAY_HOOKS]
+    all_hooks = sunday_hooks + trend_hooks + music_hooks
 
     # 3. Pick today's music vibe
     music_vibe  = random.choice(MUSIC_VIBES)

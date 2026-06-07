@@ -1,0 +1,19 @@
+{
+  "blocked_video_ids": [
+    33835028,
+    33835057,
+    7217602,
+    8724306,
+    9465053,
+    8724451
+  ],
+  "blocked_photo_ids": [],
+  "notes": {
+    "33835028": "traditional local dancers — not brand appropriate",
+    "33835057": "does not fit brand style — not appropriate for adverts",
+    "7217602": "lady holding orange — irrelevant object, poor visual fit",
+    "8724306": "bad train clip - user rejected",
+    "9465053": "bad train clip - user rejected",
+    "8724451": "bad train clip - user rejected"
+  }
+}
