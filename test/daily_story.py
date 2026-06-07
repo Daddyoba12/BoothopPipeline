@@ -2,28 +2,15 @@
 test/daily_story.py
 BootHop Daily Story Reel — character-driven postcard videos.
 
-Rotates through 10 story archetypes daily. Each story is:
-  - 4 postcard cards (7.5s each) + 5s closing = 35s
-  - Real character, emotional arc, Pidgin English hooks
-  - Beautiful / interesting visuals matching the character
-
-Characters:
-  1. Fine Boy Goes Lagos Broke
-  2. Fine Girl on the Train (funny/flirty)
-  3. The Nurse (trust & care)
-  4. Naija Man in Agbada (going home proud)
-  5. The Student (Japa life, earning while moving)
-  6. Manchester Night Train (domestic UK, funny)
-  7. Newcastle to Bristol (meet random fine person)
-  8. The Fashion Slay Queen
-  9. The Tough Guy Who Cares
-  10. Mum at the Airport (emotional)
+Each day Claude AI generates a fresh story idea (character, hooks, queries).
+The 10 built-in stories are fallback only if the AI call fails.
 
 Run: python test/daily_story.py
-     python test/daily_story.py --story 3   (pick specific story)
+     python test/daily_story.py --story 3   (force built-in story #3)
+     python test/daily_story.py --fresh      (skip cache, generate new AI story)
 """
 
-import random, subprocess, sys
+import json, random, subprocess, sys
 import requests
 from datetime import datetime, date
 from pathlib import Path
@@ -466,14 +453,145 @@ STORIES = [
 ]
 
 
+# ── AI story generator ────────────────────────────────────────────────────────
+
+_STORY_CACHE = BASE / "data" / "daily_story_cache.json"
+
+_EXISTING_NAMES = [s["name"] for s in STORIES]
+
+_MONTH_TRENDS = {
+    1:  "New Year hustle, January blues, NYSC camp",
+    2:  "Valentine season, love runs, diaspora gifts",
+    3:  "Eid preparations, spring travel, Naija weddings",
+    4:  "Easter travel, Passover, school holiday packages",
+    5:  "Workers Day Nigeria, summer prep, exam season",
+    6:  "Detty June Lagos, Eid al-Adha, Super Eagles matches, NYSC",
+    7:  "Summer Japa wave, school holiday UK, Lagos beach vibes",
+    8:  "Afrobeats festival season, back to school, BBNaija announcement",
+    9:  "Ember months begin, Nigeria independence October prep",
+    10: "Nigeria independence day, Detty December prep",
+    11: "Black Friday, diaspora Christmas shopping starts",
+    12: "Detty December, Christmas, New Year Lagos parties",
+}
+
+def _ai_generate_story() -> dict | None:
+    """Call Claude API to generate a fresh story idea for today."""
+    try:
+        sys.path.insert(0, str(BASE / "scripts"))
+        from config import ANTHROPIC_API_KEY
+        import anthropic
+    except Exception as e:
+        print(f"  [AI Story] Cannot load Anthropic: {e}"); return None
+
+    today      = date.today()
+    day_name   = today.strftime("%A")
+    month_name = today.strftime("%B")
+    trend_ctx  = _MONTH_TRENDS.get(today.month, "")
+    existing   = ", ".join(_EXISTING_NAMES)
+
+    sunday_hint = ""
+    if today.weekday() == 6:
+        sunday_hint = "Today is Sunday — church/gospel/testimony angle works well."
+
+    prompt = f"""You create viral social media story reels for BootHop — a UK-to-Nigeria parcel startup where trusted travellers carry parcels for cash.
+
+Today: {day_name} {today.isoformat()}. Month context: {month_name} — {trend_ctx}. {sunday_hint}
+
+DO NOT reuse any of these existing characters: {existing}.
+
+Generate ONE brand-new, creative character story. Think fresh angles:
+- Celebrities' relatives, market traders, church ushers, Uber drivers, barbers, hairdressers, pharmacists, returning NYSC members, Detty December revellers, football fans, hawkers, mechanics, chefs, security guards, wig sellers — anyone real and relatable.
+- Mix funny, emotional, aspirational. Use Pidgin/Naija slang where natural.
+- The story must involve BootHop either earning money carrying a parcel OR sending something important via a traveller.
+
+Return ONLY valid JSON, no markdown fences, no explanation:
+{{
+  "name": "short_snake_case_name",
+  "cards": [
+    {{"top": "setup context (max 8 words)", "main": "BIG HOOK (max 6 words)", "sub": "detail or punchline (max 16 words)", "color": "#ffffff"}},
+    {{"top": "...", "main": "...", "sub": "...", "color": "#facc15"}},
+    {{"top": "...", "main": "...", "sub": "...", "color": "#10b981"}},
+    {{"top": "...", "main": "...", "sub": "...", "color": "#fb923c"}}
+  ],
+  "queries": [
+    ["african person face <emotion> portrait close up", "black person face <mood> headshot", "nigerian person face <expression> close up"],
+    ["<card2 face queries>"],
+    ["<card3 face queries>"],
+    ["<card4 face queries>"]
+  ],
+  "hashtags": "#BootHop #two #more #relevant",
+  "cta": "one punchy call to action (max 12 words)"
+}}"""
+
+    try:
+        client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        msg = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=1024,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        raw = msg.content[0].text.strip()
+        # Strip markdown fences if present
+        if raw.startswith("```"):
+            raw = raw.split("```")[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
+        story = json.loads(raw.strip())
+        # Basic validation
+        assert len(story["cards"]) == 4
+        assert len(story["queries"]) == 4
+        print(f"  [AI Story] Generated: {story['name']}")
+        return story
+    except Exception as e:
+        print(f"  [AI Story] Generation failed: {e}"); return None
+
+
+def _load_cached_story() -> dict | None:
+    try:
+        cache = json.loads(_STORY_CACHE.read_text(encoding="utf-8"))
+        if cache.get("date") == date.today().isoformat():
+            print(f"  [AI Story] Using cached: {cache['story']['name']}")
+            return cache["story"]
+    except Exception:
+        pass
+    return None
+
+
+def _save_cached_story(story: dict):
+    try:
+        _STORY_CACHE.parent.mkdir(exist_ok=True)
+        _STORY_CACHE.write_text(
+            json.dumps({"date": date.today().isoformat(), "story": story}, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+    except Exception as e:
+        print(f"  [AI Story] Cache save failed: {e}")
+
+
 # ── Select today's story ──────────────────────────────────────────────────────
 
-def pick_story(override: int | None = None) -> dict:
+def pick_story(override: int | None = None, fresh: bool = False) -> dict:
+    # Forced built-in story by number
     if override is not None:
         idx = (override - 1) % len(STORIES)
-    else:
-        idx = _doy % len(STORIES)
-    return STORIES[idx]
+        return STORIES[idx]
+
+    # Try cached AI story first (skip cache if --fresh)
+    if not fresh:
+        cached = _load_cached_story()
+        if cached:
+            return cached
+
+    # Generate new AI story
+    print("  [AI Story] Generating fresh story idea with Claude...")
+    ai_story = _ai_generate_story()
+    if ai_story:
+        _save_cached_story(ai_story)
+        return ai_story
+
+    # Fallback: built-in rotation
+    print("  [AI Story] Falling back to built-in rotation")
+    return STORIES[_doy % len(STORIES)]
 
 
 # ── Music ─────────────────────────────────────────────────────────────────────
@@ -910,13 +1028,14 @@ def render(story: dict, clips: list[Path | None], audio: Path | None) -> Path | 
 
 def main():
     override = None
+    fresh    = "--fresh" in sys.argv
     if "--story" in sys.argv:
         try:
             override = int(sys.argv[sys.argv.index("--story") + 1])
         except (IndexError, ValueError):
             pass
 
-    story = pick_story(override)
+    story = pick_story(override, fresh=fresh)
     out_mp4 = TEST / f"daily_story_{story['name']}.mp4"
 
     print("\n" + "=" * 60)
