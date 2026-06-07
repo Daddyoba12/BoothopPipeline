@@ -489,18 +489,22 @@ def _ai_generate_story() -> dict | None:
     trend_ctx  = _MONTH_TRENDS.get(today.month, "")
     existing   = ", ".join(_EXISTING_NAMES)
 
-    sunday_hint = ""
-    if today.weekday() == 6:
-        sunday_hint = "Today is Sunday — church/gospel/testimony angle works well."
+    is_sunday = today.weekday() == 6
+    church_rule = (
+        "Today is Sunday — a church/gospel/testimony angle is encouraged."
+        if is_sunday else
+        "IMPORTANT: Do NOT use church, gospel, testimony, or religious themes today — those are for Sundays only."
+    )
 
     prompt = f"""You create viral social media story reels for BootHop — a UK-to-Nigeria parcel startup where trusted travellers carry parcels for cash.
 
-Today: {day_name} {today.isoformat()}. Month context: {month_name} — {trend_ctx}. {sunday_hint}
+Today: {day_name} {today.isoformat()}. Month context: {month_name} — {trend_ctx}.
+{church_rule}
 
 DO NOT reuse any of these existing characters: {existing}.
 
 Generate ONE brand-new, creative character story. Think fresh angles:
-- Celebrities' relatives, market traders, church ushers, Uber drivers, barbers, hairdressers, pharmacists, returning NYSC members, Detty December revellers, football fans, hawkers, mechanics, chefs, security guards, wig sellers — anyone real and relatable.
+- Celebrities' relatives, market traders, Uber drivers, barbers, hairdressers, pharmacists, returning NYSC members, Detty December revellers, football fans, hawkers, mechanics, chefs, security guards, wig sellers, doctors, teachers — anyone real and relatable.
 - Mix funny, emotional, aspirational. Use Pidgin/Naija slang where natural.
 - The story must involve BootHop either earning money carrying a parcel OR sending something important via a traveller.
 
