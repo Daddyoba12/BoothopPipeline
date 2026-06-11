@@ -1,0 +1,372 @@
+[2026-05-18 13:05:17] =======================================================
+[2026-05-18 13:05:17] BootHop Blog Auto-Poster starting
+[2026-05-18 13:05:17] Found 1 pending post(s)
+[2026-05-18 13:05:17] Processing: 2026-05-18_example-post.html
+[2026-05-18 13:05:17]   Title:  How BootHop Is Changing the Way the UK Sends to Nigeria
+[2026-05-18 13:05:17]   Labels: ['logistics', 'diaspora', 'UK Nigeria', 'same-day delivery', 'BootHop']
+[2026-05-18 13:05:23]   Emailed to Blogger: daddyoba12.obaloluwa@blogger.com
+[2026-05-18 13:05:23]   Done — moved to posted/
+[2026-05-18 13:05:23] All done.
+[2026-05-18 13:05:23] =======================================================
+[2026-05-19 14:31:51] =======================================================
+[2026-05-19 14:31:51] BootHop Blog Auto-Poster starting
+[2026-05-19 14:31:51] Found 3 pending post(s)
+[2026-05-19 14:31:51] Processing: 2026-05-19_5-reasons-verified-travellers-same-day-shipping.html
+[2026-05-19 14:31:51]   Title:  5 Reasons Why Verified Travellers Are the Secret to Same-Day Global Shipping
+[2026-05-19 14:31:51]   Labels: ['Verified Travellers', 'Same-Day Delivery', 'International Courier', 'Cross-Border Shipping', 'BootHop']
+[2026-05-19 14:40:14] =======================================================
+[2026-05-19 14:40:14] BootHop Blog Auto-Poster starting
+[2026-05-19 14:40:14] Found 3 pending post(s)
+[2026-05-19 14:40:14] Processing: 2026-05-19_5-reasons-verified-travellers-same-day-shipping.html
+[2026-05-19 14:40:14]   Title:  5 Reasons Why Verified Travellers Are the Secret to Same-Day Global Shipping
+[2026-05-19 14:40:14]   Labels: ['Verified Travellers', 'Same-Day Delivery', 'International Courier', 'Cross-Border Shipping', 'BootHop']
+[2026-05-19 14:40:15]   Emailed to Blogger: daddyoba12.obaloluwa@blogger.com
+[2026-05-19 14:40:15]   Done — moved to posted/
+[2026-05-19 14:40:15] Processing: 2026-05-19_beyond-the-border-ai-customs-clearance.html
+[2026-05-19 14:40:15]   Title:  Beyond the Border: Why AI is the Secret to Seamless Customs Clearance
+[2026-05-19 14:40:15]   Labels: ['Customs & Compliance', 'Cross-Border Delivery', 'AI Logistics', 'BootHop']
+[2026-05-19 14:40:16]   Emailed to Blogger: daddyoba12.obaloluwa@blogger.com
+[2026-05-19 14:40:16]   Done — moved to posted/
+[2026-05-19 14:40:16] Processing: 2026-05-19_on-board-courier-vs-express-air-freight.html
+[2026-05-19 14:40:16]   Title:  On-Board Courier vs. Express Air Freight: Which Is Better For Your Urgent International Courier Needs?
+[2026-05-19 14:40:16]   Labels: ['On-Board Courier', 'Express Air Freight', 'Urgent International Courier', 'Time-Critical Logistics', 'BootHop']
+[2026-05-19 14:40:17]   Emailed to Blogger: daddyoba12.obaloluwa@blogger.com
+[2026-05-19 14:40:17]   Done — moved to posted/
+[2026-05-19 14:40:17] All done.
+[2026-05-19 14:40:17] =======================================================
+[2026-05-19 15:45:38]   ERROR: Connection unexpectedly closed: [WinError 10053] An established connection was aborted by the software in your host machine
+[2026-05-19 15:45:38] Processing: 2026-05-19_beyond-the-border-ai-customs-clearance.html
+[2026-05-19 15:45:38]   ERROR: [Errno 2] No such file or directory: 'C:\\Users\\babso\\Desktop\\BootHopPipeline\\blog\\pending\\2026-05-19_beyond-the-border-ai-customs-clearance.html'
+[2026-05-19 15:45:38] Processing: 2026-05-19_on-board-courier-vs-express-air-freight.html
+[2026-05-19 15:45:38]   ERROR: [Errno 2] No such file or directory: 'C:\\Users\\babso\\Desktop\\BootHopPipeline\\blog\\pending\\2026-05-19_on-board-courier-vs-express-air-freight.html'
+[2026-05-19 15:45:38] All done.
+[2026-05-19 15:45:38] =======================================================
+[2026-05-19 17:08:04] =======================================================
+[2026-05-19 17:39:51] =======================================================
+[2026-05-19 17:39:51] BootHop PDF Drop -> Blog starting
+[2026-05-19 17:39:51] Found 3 PDF(s) to post
+[2026-05-19 17:39:51] Processing: 5-reasons-why-verified-travellers-are-the-secret-to-same-day-global-shipping.pdf
+[2026-05-19 17:39:51]   Title: 5 Reasons Why Verified Travellers Are The Secret To Same Day Global Shipping
+[2026-05-19 17:39:52]   Posted & moved to posted/pdfs/
+[2026-05-19 17:39:52] Processing: beyond-the-border-why-ai-is-the-secret-to-seamless-customs-clearance.pdf
+[2026-05-19 17:39:52]   Title: Beyond The Border Why Ai Is The Secret To Seamless Customs Clearance
+[2026-05-19 17:39:53]   Posted & moved to posted/pdfs/
+[2026-05-19 17:39:53] Processing: on-board-courier-vs-express-air-freight-which-is-better-for-your-urgent-international-courier-needs.pdf
+[2026-05-19 17:39:53]   Title: On Board Courier Vs Express Air Freight Which Is Better For Your Urgent International Courier Needs
+[2026-05-19 17:39:55]   Posted & moved to posted/pdfs/
+[2026-05-19 17:39:55] All done.
+[2026-05-19 17:39:55] =======================================================
+[2026-05-20 00:51:59] =======================================================
+[2026-05-20 00:51:59] BootHop Blog Auto-Poster starting
+[2026-05-20 00:51:59] Found 1 pending post(s)
+[2026-05-20 00:51:59] Processing: 2026-05-20_test-post.html
+[2026-05-20 00:51:59]   Title:  BootHop Test Post
+[2026-05-20 00:51:59]   Labels: none
+[2026-05-20 00:52:02]   Emailed to Blogger: daddyoba12.toyin130@blogger.com
+[2026-05-20 00:52:02]   Done — moved to posted/
+[2026-05-20 00:52:02] All done.
+[2026-05-20 00:52:02] =======================================================
+[2026-05-20 09:30:01] =======================================================
+[2026-05-20 09:30:01] BootHop PDF Drop -> Blog starting
+[2026-05-20 09:30:01] No PDFs found in blog/drop/ — nothing to post.
+[2026-05-20 09:30:01] =======================================================
+[2026-05-20 10:59:55] =======================================================
+[2026-05-20 10:59:55] BootHop Blog Auto-Poster starting
+[2026-05-20 10:59:55] Found 1 pending post(s)
+[2026-05-20 10:59:55] Processing: 2026-05-20_api-test.html
+[2026-05-20 10:59:55]   Title:  BootHop Is Now Live
+[2026-05-20 10:59:55]   Labels: ['logistics', 'BootHop']
+[2026-05-20 10:59:56]   API error 403: {
+  "error": {
+    "code": 403,
+    "message": "Blogger API has not been used in project 872621956046 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/blogger.googleapis.com/overview?project=872621956046 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.",
+    "errors": [
+      {
+        "message": "Blogger API has not been used in project 872621956046 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/blogger.googleapis.com/overview?project=872621956046 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.",
+        "domain": "usageLimits",
+        "reason": "accessNotConfigured",
+        "extendedHelp": "https://console.developers.google.com"
+      }
+    ],
+    "status": "PERMISSION_DENIED",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "SERVICE_DISABLED",
+        "domain": "googleapis.com",
+        "metadata": {
+          "consumer": "projects/872621956046",
+          "serviceTitle": "Blogger API",
+          "containerInfo": "872621956046",
+          "activationUrl": "https://console.developers.google.com/apis/api/blogger.googleapis.com/overview?project=872621956046",
+          "service": "blogger.googleapis.com"
+        }
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+        "locale": "en-US",
+        "message": "Blogger API has not been used in project 872621956046 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/blogger.googleapis.com/overview?project=872621956046 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry."
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.Help",
+        "links": [
+          {
+            "description": "Google developers console API activation",
+            "url": "https://console.developers.google.com/apis/api/blogger.googleapis.com/overview?project=872621956046"
+          }
+        ]
+      }
+    ]
+  }
+}
+
+[2026-05-20 10:59:56]   FAILED — stays in pending/
+[2026-05-20 10:59:56] All done.
+[2026-05-20 10:59:56] =======================================================
+[2026-05-20 11:02:53] =======================================================
+[2026-05-20 11:02:53] BootHop Blog Auto-Poster starting
+[2026-05-20 11:02:53] Found 1 pending post(s)
+[2026-05-20 11:02:53] Processing: 2026-05-20_api-test.html
+[2026-05-20 11:02:53]   Title:  BootHop Is Now Live
+[2026-05-20 11:02:53]   Labels: ['logistics', 'BootHop']
+[2026-05-20 11:02:55]   Posted via API: https://boothopmovement.blogspot.com/2026/05/boothop-is-now-live.html
+[2026-05-20 11:02:55]   Done — moved to posted/
+[2026-05-20 11:02:55] All done.
+[2026-05-20 11:02:55] =======================================================
+[2026-05-21 12:17:35] =======================================================
+[2026-05-21 12:17:35] BootHop PDF Drop -> Blog starting
+[2026-05-21 12:17:35] No PDFs found in blog/drop/ — nothing to post.
+[2026-05-21 12:17:35] =======================================================
+[2026-05-22 09:30:01] =======================================================
+[2026-05-22 09:30:01] BootHop PDF Drop -> Blog starting
+[2026-05-22 09:30:01] No PDFs found in blog/drop/ — nothing to post.
+[2026-05-22 09:30:01] =======================================================
+[2026-05-24 10:47:47] =======================================================
+[2026-05-24 10:47:47] BootHop PDF Drop -> Blog starting
+[2026-05-24 10:47:47] No PDFs found in blog/drop/ — nothing to post.
+[2026-05-24 10:47:47] =======================================================
+[2026-05-25 09:30:01] =======================================================
+[2026-05-25 09:30:01] BootHop PDF Drop -> Blog starting
+[2026-05-25 09:30:01] No PDFs found in blog/drop/ — nothing to post.
+[2026-05-25 09:30:01] =======================================================
+[2026-05-26 18:31:43] =======================================================
+[2026-05-26 18:31:43] BootHop PDF Drop -> Blog starting
+[2026-05-26 18:31:43] No PDFs found in blog/drop/ — nothing to post.
+[2026-05-26 18:31:43] =======================================================
+[2026-05-27 16:47:35] =======================================================
+[2026-05-27 16:47:35] BootHop Blog Auto-Poster starting
+[2026-05-27 16:47:35] Archived: 2026-05-18_example-post.html
+[2026-05-27 16:47:35] Archived: 2026-05-19_5-reasons-verified-travellers-same-day-shipping.html
+[2026-05-27 16:47:35] Archived: 2026-05-19_beyond-the-border-ai-customs-clearance.html
+[2026-05-27 16:47:35] Archived: 2026-05-19_on-board-courier-vs-express-air-freight.html
+[2026-05-27 16:47:35] Archived: 2026-05-20_api-test.html
+[2026-05-27 16:47:35] Archived: 2026-05-20_test-post.html
+[2026-05-27 16:47:35] Archived 6 old post(s)
+[2026-05-27 16:47:35] Found 6 pending post(s)
+[2026-05-28 09:37:01] =======================================================
+[2026-05-28 09:37:01] BootHop PDF Drop -> Blog starting
+[2026-05-28 09:37:01] No PDFs found in blog/drop/ — nothing to post.
+[2026-05-28 09:37:01] =======================================================
+[2026-05-29 17:30:46] =======================================================
+[2026-05-29 17:30:46] BootHop Blog Auto-Poster starting
+[2026-05-29 17:30:46] Found 6 pending post(s)
+[2026-05-29 17:38:36] =======================================================
+[2026-05-29 17:38:36] BootHop Blog Auto-Poster starting
+[2026-05-29 17:38:36] Found 6 pending post(s)
+[2026-05-29 17:38:36] Processing: 2026-05-24_what-can-you-send-to-nigeria-through-boothop-the-customs-gui.html
+[2026-05-29 17:38:36]   Title:  What Can You Send to Nigeria Through BootHop? The Customs Guide
+[2026-05-29 17:38:36]   Labels: ['customs', 'Nigeria', 'guide', 'what to send']
+[2026-05-29 17:38:37]   Posted via API: https://boothopmovement.blogspot.com/2026/05/what-can-you-send-to-nigeria-through.html
+[2026-05-29 17:38:37]   Done — moved to posted/
+[2026-05-29 17:38:37] Processing: 2026-05-25_partnership-opportunities-how-to-become-a-boothop-business-p.html
+[2026-05-29 17:38:37]   Title:  Partnership Opportunities: How to Become a BootHop Business Partner
+[2026-05-29 17:38:37]   Labels: ['business', 'B2B', 'partnerships', 'logistics', 'Africa']
+[2026-05-29 17:38:38]   Posted via API: https://boothopmovement.blogspot.com/2026/05/partnership-opportunities-how-to-become.html
+[2026-05-29 17:38:38]   Done — moved to posted/
+[2026-05-29 17:38:38] Processing: 2026-05-25_the-diaspora-suitcase-problem-and-how-boothop-solved-it.html
+[2026-05-29 17:38:38]   Title:  The Diaspora Suitcase Problem — and How BootHop Solved It
+[2026-05-29 17:38:38]   Labels: ['diaspora', 'culture', 'UK-Nigeria', 'community']
+[2026-05-29 17:38:40]   Posted via API: https://boothopmovement.blogspot.com/2026/05/the-diaspora-suitcase-problem-and-how.html
+[2026-05-29 17:38:40]   Done — moved to posted/
+[2026-05-29 17:38:40] Processing: 2026-05-25_the-real-cost-of-shipping-delays-why-speed-matters-more-than.html
+[2026-05-29 17:38:40]   Title:  The Real Cost of Shipping Delays: Why Speed Matters More Than Price for B2B Logistics
+[2026-05-29 17:38:40]   Labels: ['business', 'B2B', 'logistics', 'supply chain', 'speed', 'Africa']
+[2026-05-29 17:38:41]   Posted via API: https://boothopmovement.blogspot.com/2026/05/the-real-cost-of-shipping-delays-why.html
+[2026-05-29 17:38:41]   Done — moved to posted/
+[2026-05-29 17:38:41] Processing: 2026-05-26_corporate-gifting-across-borders-how-uk-companies-are-using-.html
+[2026-05-29 17:38:41]   Title:  Corporate Gifting Across Borders: How UK Companies Are Using BootHop for Their African Clients
+[2026-05-29 17:38:41]   Labels: ['business', 'B2B', 'corporate gifting', 'client relations', 'HR']
+[2026-05-29 17:38:42]   Posted via API: https://boothopmovement.blogspot.com/2026/05/corporate-gifting-across-borders-how-uk.html
+[2026-05-29 17:38:42]   Done — moved to posted/
+[2026-05-29 17:38:42] Processing: 2026-05-27_how-boothop-works-the-complete-guide-for-senders.html
+[2026-05-29 17:38:42]   Title:  How BootHop Works: The Complete Guide for Senders
+[2026-05-29 17:38:42]   Labels: ['how it works', 'sender', 'guide', 'logistics']
+[2026-05-29 17:38:42]   API error 429: {
+  "error": {
+    "code": 429,
+    "message": "Resource has been exhausted (e.g. check quota).",
+    "errors": [
+      {
+        "message": "Resource has been exhausted (e.g. check quota).",
+        "domain": "global",
+        "reason": "rateLimitExceeded"
+      }
+    ],
+    "status": "RESOURCE_EXHAUSTED"
+  }
+}
+
+[2026-05-29 17:38:42]   FAILED — stays in pending/
+[2026-05-29 17:38:42] All done.
+[2026-05-29 17:38:42] =======================================================
+[2026-05-30 09:30:02] =======================================================
+[2026-05-30 09:30:02] BootHop PDF Drop -> Blog starting
+[2026-05-30 09:30:02] No PDFs found in blog/drop/ — nothing to post.
+[2026-05-30 09:30:02] =======================================================
+[2026-05-31 09:30:01] =======================================================
+[2026-05-31 09:30:01] BootHop PDF Drop -> Blog starting
+[2026-05-31 09:30:01] No PDFs found in blog/drop/ — nothing to post.
+[2026-05-31 09:30:01] =======================================================
+[2026-06-01 11:59:12] =======================================================
+[2026-06-01 11:59:12] BootHop PDF Drop -> Blog starting
+[2026-06-01 11:59:12] No PDFs found in blog/drop/ — nothing to post.
+[2026-06-01 11:59:12] =======================================================
+[2026-06-01 18:10:31] =======================================================
+[2026-06-01 18:10:31] BootHop Blog Auto-Poster starting
+[2026-06-01 18:10:31] Found 4 pending post(s)
+[2026-06-01 18:10:32] Processing: 2026-05-27_how-boothop-works-the-complete-guide-for-senders.html
+[2026-06-01 18:10:32]   Title:  How BootHop Works: The Complete Guide for Senders
+[2026-06-01 18:10:32]   Labels: ['how it works', 'sender', 'guide', 'logistics']
+[2026-06-01 18:10:33]   Posted via API: https://boothopmovement.blogspot.com/2026/06/how-boothop-works-complete-guide-for.html
+[2026-06-01 18:10:33]   Done — moved to posted/
+[2026-06-01 18:10:33] Processing: 2026-05-30_5-ways-to-maximise-your-earnings-as-a-boothop-traveller.html
+[2026-06-01 18:10:33]   Title:  5 Ways to Maximise Your Earnings as a BootHop Traveller
+[2026-06-01 18:10:33]   Labels: ['tips', 'traveller', 'earn', 'income', 'guide']
+[2026-06-01 18:10:34]   Posted via API: https://boothopmovement.blogspot.com/2026/06/5-ways-to-maximise-your-earnings-as.html
+[2026-06-01 18:10:34]   Done — moved to posted/
+[2026-06-01 18:10:34] Processing: 2026-05-31_how-import-agents-are-using-boothop-for-product-sampling-bef.html
+[2026-06-01 18:10:34]   Title:  How Import Agents Are Using BootHop for Product Sampling Before Committing to Freight
+[2026-06-01 18:10:34]   Labels: ['business', 'B2B', 'import', 'sampling', 'trade', 'logistics']
+[2026-06-01 18:10:35]   Posted via API: https://boothopmovement.blogspot.com/2026/06/how-import-agents-are-using-boothop-for.html
+[2026-06-01 18:10:35]   Done — moved to posted/
+[2026-06-01 18:10:35] Processing: 2026-06-01_what-can-you-send-to-nigeria-through-boothop-the-customs-gui.html
+[2026-06-01 18:10:35]   Title:  What Can You Send to Nigeria Through BootHop? The Customs Guide
+[2026-06-01 18:10:35]   Labels: ['customs', 'Nigeria', 'guide', 'what to send']
+[2026-06-01 18:10:36]   Posted via API: https://boothopmovement.blogspot.com/2026/06/what-can-you-send-to-nigeria-through.html
+[2026-06-01 18:10:36]   Done — moved to posted/
+[2026-06-01 18:10:36] All done.
+[2026-06-01 18:10:36] =======================================================
+[2026-06-02 09:30:02] =======================================================
+[2026-06-02 09:30:02] BootHop PDF Drop -> Blog starting
+[2026-06-02 09:30:02] No PDFs found in blog/drop/ — nothing to post.
+[2026-06-02 09:30:02] =======================================================
+[2026-06-04 08:00:01] =======================================================
+[2026-06-04 08:00:01] BootHop Weekly Blog — Thursday publish run
+[2026-06-04 08:00:01] 
+[1] Generating blog post...
+[2026-06-04 08:00:01] 
+[2] Posting to Blogger...
+[2026-06-04 08:00:01] =======================================================
+[2026-06-04 08:00:01] BootHop Blog Auto-Poster starting
+[2026-06-04 08:00:01] Found 4 pending post(s)
+[2026-06-04 08:00:02] Processing: 2026-06-02_kyc-on-boothop-why-we-verify-everyone-and-why-that-protects-.html
+[2026-06-04 08:00:02]   Title:  KYC on BootHop: Why We Verify Everyone (and Why That Protects You)
+[2026-06-04 08:00:02]   Labels: ['safety', 'KYC', 'trust', 'verification']
+[2026-06-04 08:00:03]   Posted via API: https://boothopmovement.blogspot.com/2026/06/kyc-on-boothop-why-we-verify-everyone.html
+[2026-06-04 08:00:03]   Done — moved to posted/
+[2026-06-04 08:00:03] Processing: 2026-06-03_the-real-cost-of-shipping-delays-why-speed-matters-more-than.html
+[2026-06-04 08:00:03]   Title:  The Real Cost of Shipping Delays: Why Speed Matters More Than Price for B2B Logistics
+[2026-06-04 08:00:03]   Labels: ['business', 'B2B', 'logistics', 'supply chain', 'speed', 'Africa']
+[2026-06-04 08:00:05]   Posted via API: https://boothopmovement.blogspot.com/2026/06/the-real-cost-of-shipping-delays-why.html
+[2026-06-04 08:00:05]   Done — moved to posted/
+[2026-06-04 08:00:05] Processing: 2026-06-04_earn-85320-on-your-next-flight-to-nigeria.html
+[2026-06-04 08:00:05]   Title:  Earn £85–£320 on Your Next Flight to Nigeria
+[2026-06-04 08:00:05]   Labels: ['earn', 'traveller', 'UK-Nigeria', 'side income']
+[2026-06-04 08:00:07]   Posted via API: https://boothopmovement.blogspot.com/2026/06/earn-85320-on-your-next-flight-to.html
+[2026-06-04 08:00:07]   Done — moved to posted/
+[2026-06-04 08:00:07] Processing: 2026-06-04_stop-paying-400-to-send-a-parcel-there-is-a-better-way.html
+[2026-06-04 08:00:07]   Title:  Stop Paying £400 to Send a Parcel. There Is a Better Way.
+[2026-06-04 08:00:07]   Labels: ['savings', 'cost', 'courier comparison', 'diaspora']
+[2026-06-04 08:00:09]   Posted via API: https://boothopmovement.blogspot.com/2026/06/stop-paying-400-to-send-parcel-there-is.html
+[2026-06-04 08:00:09]   Done — moved to posted/
+[2026-06-04 08:00:09] All done.
+[2026-06-04 08:00:09] =======================================================
+[2026-06-04 08:00:09] 
+[3] Pinging Google...
+[2026-06-04 08:00:10]   [Google] Ping returned 404 — Google will crawl on its own schedule
+[2026-06-04 08:00:10] 
+Blog published successfully.
+[2026-06-04 08:00:10] =======================================================
+[2026-06-04 09:30:03] =======================================================
+[2026-06-04 09:30:03] BootHop PDF Drop -> Blog starting
+[2026-06-04 09:30:03] No PDFs found in blog/drop/ — nothing to post.
+[2026-06-04 09:30:03] =======================================================
+[2026-06-05 09:30:02] =======================================================
+[2026-06-05 09:30:02] BootHop PDF Drop -> Blog starting
+[2026-06-05 09:30:02] No PDFs found in blog/drop/ — nothing to post.
+[2026-06-05 09:30:02] =======================================================
+[2026-06-07 09:30:01] =======================================================
+[2026-06-07 09:30:01] BootHop PDF Drop -> Blog starting
+[2026-06-07 09:30:01] No PDFs found in blog/drop/ — nothing to post.
+[2026-06-07 09:30:01] =======================================================
+[2026-06-08 09:30:01] =======================================================
+[2026-06-08 09:30:01] BootHop PDF Drop -> Blog starting
+[2026-06-08 09:30:01] No PDFs found in blog/drop/ — nothing to post.
+[2026-06-08 09:30:01] =======================================================
+[2026-06-09 09:30:02] =======================================================
+[2026-06-09 09:30:02] BootHop PDF Drop -> Blog starting
+[2026-06-09 09:30:02] No PDFs found in blog/drop/ — nothing to post.
+[2026-06-09 09:30:02] =======================================================
+[2026-06-09 10:01:19] =======================================================
+[2026-06-09 10:01:19] BootHop Blog Auto-Poster starting
+[2026-06-09 10:01:19] Archived: 2026-05-24_what-can-you-send-to-nigeria-through-boothop-the-customs-gui.html
+[2026-06-09 10:01:19] Archived: 2026-05-25_partnership-opportunities-how-to-become-a-boothop-business-p.html
+[2026-06-09 10:01:19] Archived: 2026-05-25_the-diaspora-suitcase-problem-and-how-boothop-solved-it.html
+[2026-06-09 10:01:19] Archived: 2026-05-25_the-real-cost-of-shipping-delays-why-speed-matters-more-than.html
+[2026-06-09 10:01:19] Archived: 2026-05-26_corporate-gifting-across-borders-how-uk-companies-are-using-.html
+[2026-06-09 10:01:19] Archived: 2026-05-27_how-boothop-works-the-complete-guide-for-senders.html
+[2026-06-09 10:01:19] Archived: 2026-05-30_5-ways-to-maximise-your-earnings-as-a-boothop-traveller.html
+[2026-06-09 10:01:19] Archived: 2026-05-31_how-import-agents-are-using-boothop-for-product-sampling-bef.html
+[2026-06-09 10:01:19] Archived: 2026-06-01_what-can-you-send-to-nigeria-through-boothop-the-customs-gui.html
+[2026-06-09 10:01:19] Archived 9 old post(s)
+[2026-06-09 10:01:19] Found 6 pending post(s)
+[2026-06-09 10:01:20] ERROR: Could not get access token — Failed to get access token: {
+  "error": "invalid_grant",
+  "error_description": "Token has been expired or revoked."
+}
+[2026-06-09 10:01:20] Run: python blog/setup_blogger.py  to re-authenticate
+[2026-06-09 10:01:20] =======================================================
+[2026-06-10 08:00:00] =======================================================
+[2026-06-10 08:00:00] BootHop Weekly Blog — Thursday publish run
+[2026-06-10 08:00:00] 
+[1] Generating blog post...
+[2026-06-10 08:00:00] 
+[2] Posting to Blogger...
+[2026-06-10 08:00:00] =======================================================
+[2026-06-10 08:00:00] BootHop Blog Auto-Poster starting
+[2026-06-10 08:00:00] Found 7 pending post(s)
+[2026-06-10 08:00:01] ERROR: Could not get access token — Failed to get access token: {
+  "error": "invalid_grant",
+  "error_description": "Token has been expired or revoked."
+}
+[2026-06-10 08:00:01] Run: python blog/setup_blogger.py  to re-authenticate
+[2026-06-10 08:00:01] =======================================================
+[2026-06-10 08:00:01] 
+[3] Pinging Google...
+[2026-06-10 08:00:02]   [Google] Ping returned 404 — Google will crawl on its own schedule
+[2026-06-10 08:00:02] 
+Blog published successfully.
+[2026-06-10 08:00:02] =======================================================
+[2026-06-10 09:30:02] =======================================================
+[2026-06-10 09:30:02] BootHop PDF Drop -> Blog starting
+[2026-06-10 09:30:02] No PDFs found in blog/drop/ — nothing to post.
+[2026-06-10 09:30:02] =======================================================
+[2026-06-11 01:26:56] =======================================================
+[2026-06-11 01:26:56] BootHop Blog Auto-Poster starting
+[2026-06-11 01:26:56] Found 8 pending post(s)
+[2026-06-11 01:26:57] ERROR: Could not get access token — Failed to get access token: {
+  "error": "invalid_grant",
+  "error_description": "Token has been expired or revoked."
+}
+[2026-06-11 01:26:57] Run: python blog/setup_blogger.py  to re-authenticate
+[2026-06-11 01:26:57] =======================================================

@@ -746,7 +746,7 @@ def main():
         re.sub(r'[^\x00-\x7F]+', '', v.get("hook", ""))[:120]
         for v in gaps["top_comp_hooks"][:3]
     ]
-    decision = wait_for_apply_decision(timeout_seconds=86400)
+    decision = wait_for_apply_decision(timeout_seconds=5400)  # 90 min — fits within 2h task limit
     if decision:
         apply_to_pipeline(gaps["gap_words"], best_hooks, gaps["comp_pov_pct"])
     else:

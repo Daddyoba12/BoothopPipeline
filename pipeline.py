@@ -124,6 +124,12 @@ FONT = FONT_TITLE  # legacy alias
 PEXELS_KEY  = "NY3tWysBJseeky8V1JEp2YjevIq6MTYcOCfuKNBU7iypjC7Qc5T1DTp5"
 TELEGRAM_TOKEN   = "8717698733:AAF7GI9Yw1DhdYVv_TK35fYQcwaGdk4caeA"
 TELEGRAM_CHAT_ID = "8641867751"
+# Loaded from config.py (gitignored) — add ANTHROPIC_API_KEY there
+try:
+    from config import ANTHROPIC_API_KEY as ANTHROPIC_KEY
+except ImportError:
+    ANTHROPIC_KEY = ""
+USE_AI_HOOKS     = True   # set False to fall back to static hooks.txt
 
 # WhatsApp Cloud API — operator number +44-7405-746302 receives all pipeline alerts
 WHATSAPP_ACCESS_TOKEN    = ""   # set in .env: WHATSAPP_ACCESS_TOKEN=...
@@ -344,6 +350,26 @@ STORY_TEMPLATES = {
             "problem":  "Wrong airport. Urgent trip at risk. No fast option.",
             "movement": "A trusted traveller was already flying that route.",
             "solution": "BootHop connects urgent needs with journeys already happening.",
+        },
+    ],
+    # Used when the hook describes someone ARRIVING (flew in, just landed, came back).
+    # The bridge: they came for a reason — now they're going back — a traveller on that
+    # return leg carries the gift. Direction stays coherent: origin → destination.
+    "airport_arrival": [
+        {
+            "problem":  "Before heading back home, there was still something important to carry.",
+            "movement": "A trusted traveller was already flying that same route back tonight.",
+            "solution": "BootHop connected the return journey with the delivery. It lands before they do.",
+        },
+        {
+            "problem":  "The visit was over. The return flight was booked. But the gift still needed to get there.",
+            "movement": "Someone trusted was already making that exact journey home tonight.",
+            "solution": "BootHop turned the return trip into the delivery. Carried with care. Same day.",
+        },
+        {
+            "problem":  "Flying back means checked bags, weight limits, no room for extras.",
+            "movement": "But a BootHop traveller heading the same way had exactly that space.",
+            "solution": "BootHop matched the gift with the return journey. It arrived the same night.",
         },
     ],
     "smart": [
@@ -1098,6 +1124,25 @@ def _mark_visual_used(pexels_id: int, query: str, is_photo: bool = False):
     _save_visuals(data)
 
 
+# ── Off-brand visual rejection ────────────────────────────────────────────────
+# Pexels often returns seasonal/food-delivery stock for generic queries.
+# Any result whose URL or alt text matches these keywords is silently skipped.
+_REJECT_VISUAL_KW = [
+    "christmas", "xmas", "santa", "festive", "bauble", "tinsel",
+    "pizza", "pizza delivery", "food delivery", "takeaway", "fast food",
+    "halloween", "easter egg", "valentine",
+    "snow delivery", "holiday season",
+]
+
+def _is_off_brand_visual(item: dict) -> bool:
+    text = " ".join([
+        str(item.get("alt", "")),
+        str(item.get("url", "")),
+        str(item.get("image", "")),
+    ]).lower()
+    return any(kw in text for kw in _REJECT_VISUAL_KW)
+
+
 def _recently_used_ids(is_photo: bool = False) -> set:
     data = _prune_visuals(_load_visuals())
     key = "photos" if is_photo else "videos"
@@ -1147,6 +1192,92 @@ def load_performance_weights():
         return defaults
 
 
+def generate_ai_hook(bucket="community", exclude=None):
+    """
+    Ask Claude to generate a fresh POV-style hook + engagement question.
+    Returns (hook, engagement) or None on failure.
+    """
+    try:
+        exclude = exclude or []
+        _, theme = get_weekly_theme()
+        theme_name = theme.get("name", "")
+        theme_kws  = ", ".join(theme.get("hook_keywords", []))
+
+        bucket_ctx = {
+            "community":  "peer-to-peer parcel delivery between UK and Nigeria diaspora",
+            "airport":    "airport logistics, missed bags, customs stories",
+            "business":   "SME business shipping and B2B logistics",
+            "family":     "families sending care packages abroad",
+            "smart":      "travel hacks, packing smart, saving money on luggage",
+            "cinematic":  "dramatic logistics stories, supply chain failures",
+            "travel":     "travel experiences with carrying luggage or parcels",
+        }.get(bucket, "peer-to-peer parcel delivery")
+
+        # Route distribution hint
+        route_roll = random.random()
+        if route_roll < 0.65:
+            audience = "UK-based Nigerians / West African diaspora sending home"
+            prefix_hint = "no prefix needed — NG/diaspora angle"
+        elif route_roll < 0.85:
+            audience = "local UK courier users"
+            prefix_hint = "start with [UK]"
+        else:
+            audience = "UK-to-Europe senders"
+            prefix_hint = "start with [EU]"
+
+        prompt = f"""You write viral TikTok hooks for BootHop — a peer-to-peer parcel delivery app used by UK/Nigeria diaspora.
+
+Context:
+- Bucket: {bucket} ({bucket_ctx})
+- Weekly theme: {theme_name} (keywords: {theme_kws})
+- Target audience: {audience}
+- Prefix rule: {prefix_hint}
+
+Generate ONE scroll-stopping POV-style hook under 12 words.
+Format: "POV: [situation] [1 emoji]"
+Examples: "POV: Your parcel made it before you did ✈️"  /  "POV: The courier knew your mum before you did 😭"
+
+Also generate ONE short engagement question (under 10 words) to put at the end of the caption.
+Example: "Have you ever had a package arrive late? 👇"
+
+Rules:
+- Hook must be emotional, specific, vivid — not generic logistics copy
+- Do NOT use the word "BootHop" in the hook
+- Engagement question must invite comments
+- Exclude these hooks (already used today): {"; ".join(exclude[:5]) if exclude else "none"}
+
+Return ONLY valid JSON: {{"hook":"...","engagement":"..."}}"""
+
+        resp = requests.post(
+            "https://api.anthropic.com/v1/messages",
+            headers={
+                "x-api-key":         ANTHROPIC_KEY,
+                "anthropic-version": "2023-06-01",
+                "content-type":      "application/json",
+            },
+            json={
+                "model":      "claude-haiku-4-5-20251001",
+                "max_tokens": 300,
+                "messages":   [{"role": "user", "content": prompt}],
+            },
+            timeout=20,
+        )
+        resp.raise_for_status()
+        raw  = resp.json()["content"][0]["text"].strip()
+        match = __import__("re").search(r"\{[\s\S]*?\}", raw)
+        if not match:
+            raise ValueError("No JSON in Claude response")
+        data = json.loads(match.group())
+        hook = data.get("hook", "").strip()
+        eng  = data.get("engagement", "").strip()
+        if hook and eng:
+            print(f"  [AI] Hook: {hook}")
+            return hook, eng
+    except Exception as e:
+        print(f"  [AI] Hook generation failed ({e}) — falling back to templates")
+    return None
+
+
 def pick_content(bucket="community", exclude=None):
     """
     Pick one hook + engagement weighted by:
@@ -1155,9 +1286,17 @@ def pick_content(bucket="community", exclude=None):
       - Last week's top performers (2.0×) — keeps what's working
       - Bucket keywords (pool filter) — keeps content on-theme for the day
       - Weekly analysis gap keywords (1.8×) — applied recommendations
+    Uses Claude AI when USE_AI_HOOKS=True, with automatic fallback to templates.
     """
     import random as _rnd
-    exclude     = exclude or []
+    exclude = exclude or []
+
+    # Try Claude AI first
+    if USE_AI_HOOKS:
+        ai_result = generate_ai_hook(bucket, exclude)
+        if ai_result:
+            return ai_result
+
     hooks       = load_lines("hooks.txt")
     engagements = load_lines("engagements.txt")
     used        = load_used()
@@ -1296,7 +1435,8 @@ def download_clips(hook, bucket, count=8, prefix="", exclude_queries=None):
 
     def _fresh_video(vids: list) -> dict | None:
         """Pick a video not used in the last 14 days and not on the blocklist."""
-        allowed = [v for v in vids if int(v.get("id", 0)) not in _blocked_vids]
+        allowed = [v for v in vids if int(v.get("id", 0)) not in _blocked_vids
+                   and not _is_off_brand_visual(v)]
         fresh   = [v for v in allowed if v.get("id") not in recent_vid_ids]
         pool    = fresh if fresh else allowed
         return random.choice(pool) if pool else None
@@ -1309,7 +1449,8 @@ def download_clips(hook, bucket, count=8, prefix="", exclude_queries=None):
         try:
             res    = requests.get(url, headers=headers, timeout=15).json()
             photos = res.get("photos", [])
-            allowed = [p for p in photos if int(p.get("id", 0)) not in _blocked_photos]
+            allowed = [p for p in photos if int(p.get("id", 0)) not in _blocked_photos
+                       and not _is_off_brand_visual(p)]
             fresh  = [p for p in allowed if p.get("id") not in recent_img_ids]
             pool   = fresh if fresh else allowed
             if not pool:
@@ -1559,7 +1700,19 @@ def build_story_script(hook: str, bucket: str):
     # Strip emojis/symbols — TTS should read words only, not ":)" or "💊"
     opening = strip_emoji(opening)
 
-    templates = STORY_TEMPLATES.get(bucket, STORY_TEMPLATES["community"])
+    # For airport hooks that describe someone ARRIVING, use the arrival-bridge
+    # templates so the story pivots to the return journey — keeping direction coherent.
+    _ARRIVAL_KW = [
+        "flew in", "flown in", "just arrived", "just landed", "landed",
+        "arriving", "came back", "coming back", "returning", "flew back",
+        "flew from lagos", "flew from nigeria", "came from", "coming from",
+        "on her way here", "on his way here",
+    ]
+    if bucket == "airport" and any(k in opening.lower() for k in _ARRIVAL_KW):
+        template_key = "airport_arrival"
+    else:
+        template_key = bucket
+    templates = STORY_TEMPLATES.get(template_key, STORY_TEMPLATES["community"])
     template  = random.choice(templates)
     hero      = random.choice(HERO_LINES.get(bucket, HERO_LINES["community"]))
 
@@ -3288,8 +3441,8 @@ def main():
             print(f"  [Delay] Sleeping 60 min — will post at ~{_delay_post_time}")
             time.sleep(3600)
 
-        # Default: TikTok=V1 (library, copyright-safe), Instagram=V2 (trending music)
-        # YouTube auto-follows TikTok's version — no separate approval needed
+        # Auto-post defaults after 1hr timeout: TikTok=V1, Instagram=V2
+        # Only skip if explicitly selected "skip" or "ignore" was set (already handled above)
         _platform_defaults = {"tiktok": 1, "instagram": 2}
         _tt_version_used = None
 
@@ -3314,6 +3467,7 @@ def main():
                     send_telegram_text(f"❌ Instagram Story post failed: {_st_e}")
                     print(f"  [Instagram Story] Error: {_st_e}")
                 continue
+            # None = no button tapped → use platform default (auto-post)
             _vnum = 2 if _ver == "v2" else (1 if _ver == "v1" else _platform_defaults[_plat])
             _post_platform(_plat, _vnum, f"V{_vnum}")
             if _plat == "tiktok":

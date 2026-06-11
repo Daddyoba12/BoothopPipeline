@@ -68,25 +68,25 @@ def fetch_youtube_trending_ng():
 
 HOOK_TEMPLATES_TREND = [
     # High energy — problem/solution
-    "POV: {trend} is everywhere. You have {item} sitting in London for your {family_member}. One verified traveller is already going. That is BootHop.",
-    "POV: It is {trend} season and your {family_member} is calling every hour. The {item} is in London. BootHop already found someone going today.",
-    "POV: {trend} week and you forgot to send {item} to Lagos. A BootHop traveller is at the airport RIGHT NOW. Book in 5 minutes.",
+    "{trend} is everywhere. You have {item} sitting in London for your {family_member}. One verified traveller is already going. That is BootHop.",
+    "It is {trend} season and your {family_member} is calling every hour. The {item} is in London. BootHop already found someone going today.",
+    "{trend} week and you forgot to send {item} to Lagos. A BootHop traveller is at the airport RIGHT NOW. Book in 5 minutes.",
     # Emotional
-    "POV: Your {family_member} has been waiting since January for that {item}. {trend} is the push you needed. BootHop gets it there today. No courier. Real person.",
-    "POV: {trend} is happening and your {family_member} in Lagos is watching everyone celebrate while YOUR package is still in London. Not anymore. BootHop.",
+    "Your {family_member} has been waiting since January for that {item}. {trend} is the push you needed. BootHop gets it there today. No courier. Real person.",
+    "{trend} is happening and your {family_member} in Lagos is watching everyone celebrate while YOUR package is still in London. Not anymore. BootHop.",
     # Viral/funny
-    "POV: You told your {family_member} the {item} is coming for {trend}. You lied. Now BootHop has to save you. It will.",
-    "POV: Abroad life is real. {trend} hits different when your {family_member} can not enjoy it without the {item} you promised from London. BootHop, go.",
+    "You told your {family_member} the {item} is coming for {trend}. You lied. Now BootHop has to save you. It will.",
+    "Abroad life is real. {trend} hits different when your {family_member} can not enjoy it without the {item} you promised from London. BootHop, go.",
     # Trust / proof
-    "POV: {trend} 2026. A real verified traveller carried my {family_member} {item} from London to Lagos in one day. That is BootHop. Not DHL. Not FedEx. A person.",
-    "POV: During {trend} someone trusted a stranger to carry mum {item} across two countries. Verified. Tracked. Delivered. That stranger was a BootHop traveller.",
+    "{trend} 2026. A real verified traveller carried my {family_member} {item} from London to Lagos in one day. That is BootHop. Not DHL. Not FedEx. A person.",
+    "During {trend} someone trusted a stranger to carry mum {item} across two countries. Verified. Tracked. Delivered. That stranger was a BootHop traveller.",
 ]
 
 HOOK_TEMPLATES_MUSIC = [
-    "POV: {artist} is playing everywhere in Lagos. You are in London watching it live on Instagram. But the gift you promised is still here. BootHop. Send it today.",
-    "POV: {artist} just dropped and your people in Lagos are going crazy. You have been saying you will send {item}. A traveller leaves tonight. Book now. BootHop.",
-    "POV: {artist} era. Your whole family is in Lagos having the time of their lives and your {item} is still in your hallway in London. BootHop. Today.",
-    "POV: Everyone is vibing to {artist}. Your {family_member} asked for ONE thing from London. You have not sent it. A verified BootHop traveller is boarding in 3 hours.",
+    "{artist} is playing everywhere in Lagos. You are in London watching it live on Instagram. But the gift you promised is still here. BootHop. Send it today.",
+    "{artist} just dropped and your people in Lagos are going crazy. You have been saying you will send {item}. A traveller leaves tonight. Book now. BootHop.",
+    "{artist} era. Your whole family is in Lagos having the time of their lives and your {item} is still in your hallway in London. BootHop. Today.",
+    "Everyone is vibing to {artist}. Your {family_member} asked for ONE thing from London. You have not sent it. A verified BootHop traveller is boarding in 3 hours.",
 ]
 
 FAMILY_MEMBERS = ["mum", "sister", "aunty", "grandma", "cousin", "dad", "brother", "wife", "baby"]
@@ -123,15 +123,15 @@ NIGERIA_FALLBACK_TRENDS = _MONTH_TRENDS.get(_current_month, [
 
 # Sunday-specific high-energy hooks (injected when today is Sunday)
 SUNDAY_HOOKS = [
-    {"hook": "POV: It is Sunday. You are in London. Mum is in church in Lagos waiting for her package from you. A BootHop traveller already flew it over. She got it before service ended.",
+    {"hook": "It is Sunday. You are in London. Mum is in church in Lagos waiting for her package from you. A BootHop traveller already flew it over. She got it before service ended.",
      "source": "sunday_special", "trend": "Sunday Naija vibes"},
-    {"hook": "POV: Sunday service in Lagos. Pastor says who has testimony? Your cousin stands up. My package from London arrived SAME DAY. That is BootHop testimony.",
+    {"hook": "Sunday service in Lagos. Pastor says who has testimony? Your cousin stands up. My package from London arrived SAME DAY. That is BootHop testimony.",
      "source": "sunday_special", "trend": "Sunday Things"},
-    {"hook": "POV: It is Sunday morning. The family WhatsApp is going crazy. The package you sent with a BootHop traveller reached Lagos overnight. You did not even know it landed.",
+    {"hook": "It is Sunday morning. The family WhatsApp is going crazy. The package you sent with a BootHop traveller reached Lagos overnight. You did not even know it landed.",
      "source": "sunday_special", "trend": "Sunday Naija vibes"},
-    {"hook": "POV: Everyone is in their Sunday best in Lagos. Your aunty is wearing the wig you sent with a BootHop traveller on Friday. She is the most glamorous in church today.",
+    {"hook": "Everyone is in their Sunday best in Lagos. Your aunty is wearing the wig you sent with a BootHop traveller on Friday. She is the most glamorous in church today.",
      "source": "sunday_special", "trend": "Sunday Things"},
-    {"hook": "POV: Sunday afternoon. Jollof is on. Family is together. The shoes you sent from London with a BootHop traveller are already being shown off. Same day. Real person.",
+    {"hook": "Sunday afternoon. Jollof is on. Family is together. The shoes you sent from London with a BootHop traveller are already being shown off. Same day. Real person.",
      "source": "sunday_special", "trend": "Sunday Naija vibes"},
 ]
 

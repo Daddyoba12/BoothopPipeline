@@ -1,0 +1,108 @@
+{
+  "date": "2026-06-10",
+  "trends": [
+    "Nollywood premiere",
+    "Afrobeats festival",
+    "Valentine Lagos",
+    "Detty December",
+    "Super Eagles match",
+    "Mother Day Nigeria",
+    "NYSC camp season",
+    "Big Brother Naija"
+  ],
+  "hooks": [
+    {
+      "hook": "Because of Nollywood premiere, the whole family is gathering. Your phone from London needs to be there. BootHop makes it happen.",
+      "source": "google_trend",
+      "trend": "Nollywood premiere",
+      "generated": "2026-06-10T05:45:53.206507"
+    },
+    {
+      "hook": "Because of Afrobeats festival, the whole family is gathering. Your documents from London needs to be there. BootHop makes it happen.",
+      "source": "google_trend",
+      "trend": "Afrobeats festival",
+      "generated": "2026-06-10T05:45:53.206523"
+    },
+    {
+      "hook": "Everyone is talking about Valentine Lagos. You promised to send baby items in time. BootHop turns a traveller already going that way into your delivery.",
+      "source": "google_trend",
+      "trend": "Valentine Lagos",
+      "generated": "2026-06-10T05:45:53.206531"
+    },
+    {
+      "hook": "Detty December season is here. Your brother in Lagos is waiting on medication from the UK. One BootHop booking. Same day.",
+      "source": "google_trend",
+      "trend": "Detty December",
+      "generated": "2026-06-10T05:45:53.206536"
+    },
+    {
+      "hook": "Super Eagles match season is here. Your dad in Lagos is waiting on birthday gift from the UK. One BootHop booking. Same day.",
+      "source": "google_trend",
+      "trend": "Super Eagles match",
+      "generated": "2026-06-10T05:45:53.206541"
+    },
+    {
+      "hook": "Mother Day Nigeria has the whole of Lagos buzzing and your aunty needs her phone from London before the celebrations. BootHop gets it there same day.",
+      "source": "google_trend",
+      "trend": "Mother Day Nigeria",
+      "generated": "2026-06-10T05:45:53.206545"
+    },
+    {
+      "hook": "Because of NYSC camp season, the whole family is gathering. Your shoes from London needs to be there. BootHop makes it happen.",
+      "source": "google_trend",
+      "trend": "NYSC camp season",
+      "generated": "2026-06-10T05:45:53.206549"
+    },
+    {
+      "hook": "Everyone is talking about Big Brother Naija. You promised to send shoes in time. BootHop turns a traveller already going that way into your delivery.",
+      "source": "google_trend",
+      "trend": "Big Brother Naija",
+      "generated": "2026-06-10T05:45:53.206554"
+    },
+    {
+      "hook": "Everyone in Lagos is vibing to Asake right now. You have a gift to send. BootHop connects it to a traveller already going your way.",
+      "source": "music_trend",
+      "trend": "Asake",
+      "generated": "2026-06-10T05:45:53.206573"
+    },
+    {
+      "hook": "Ckay just dropped and your sister needs the merch from London before the Lagos concert. BootHop delivers it the same day.",
+      "source": "music_trend",
+      "trend": "Ckay",
+      "generated": "2026-06-10T05:45:53.206578"
+    },
+    {
+      "hook": "Everyone in Lagos is vibing to Tems right now. You have a gift to send. BootHop connects it to a traveller already going your way.",
+      "source": "music_trend",
+      "trend": "Tems",
+      "generated": "2026-06-10T05:45:53.206582"
+    },
+    {
+      "hook": "Burna Boy just dropped and your sister needs the merch from London before the Lagos concert. BootHop delivers it the same day.",
+      "source": "music_trend",
+      "trend": "Burna Boy",
+      "generated": "2026-06-10T05:45:53.206585"
+    }
+  ],
+  "hook_count": 12,
+  "music_vibe": {
+    "vibe": "Amapiano",
+    "bpm": "110-115",
+    "mood": "smooth, groovy, laid-back cool"
+  },
+  "hashtag_sets": {
+    "family": "#BootHop #NaijaUK #LondonToLagos #DiasporaMagic #SameDayDelivery #NigerianTikTok #DiasporaLife #NaijaFamily #NigeriaUK #Afrobeats #AfrobeatsLife #Banger",
+    "business": "#BootHop #NaijaUK #LondonToLagos #DiasporaMagic #SameDayDelivery #NigerianTikTok #NaijaCommunity #LagosLife #AfricanTikTok #Afrobeats #AfrobeatsLife #Banger",
+    "airport": "#BootHop #NaijaUK #LondonToLagos #DiasporaMagic #SameDayDelivery #NigerianTikTok #NaijaCommunity #LagosLife #AfricanTikTok #Afrobeats #AfrobeatsLife #Banger",
+    "smart": "#BootHop #NaijaUK #LondonToLagos #DiasporaMagic #SameDayDelivery #NigerianTikTok #Lagos #NaijaCommunity #Abuja #Afrobeats #AfrobeatsLife #Banger",
+    "cinematic": "#BootHop #NaijaUK #LondonToLagos #DiasporaMagic #SameDayDelivery #NigerianTikTok #Abuja #LagosLife #AfricanTikTok #Afrobeats #AfrobeatsLife #Banger",
+    "community": "#BootHop #NaijaUK #LondonToLagos #DiasporaMagic #SameDayDelivery #NigerianTikTok #Lagos #AfricanTikTok #Abuja #Afrobeats #AfrobeatsLife #Banger"
+  },
+  "trending_hashtags": [
+    "#NollywoodPremiere",
+    "#AfrobeatsFestival",
+    "#ValentineLagos",
+    "#DettyDecember",
+    "#SuperEaglesMatch"
+  ]
+}
