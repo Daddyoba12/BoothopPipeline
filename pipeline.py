@@ -1192,9 +1192,22 @@ def load_performance_weights():
         return defaults
 
 
+def _pov_used_this_week() -> int:
+    """Count how many POV hooks have been used in the last 7 days."""
+    try:
+        used = load_used()
+        hooks = used.get("hooks", [])
+        # used_content.json is appended in order — last 14 entries = ~7 days (2/day)
+        recent = hooks[-14:] if len(hooks) >= 14 else hooks
+        return sum(1 for h in recent if h.lower().startswith("pov:"))
+    except Exception:
+        return 0
+
+
 def generate_ai_hook(bucket="community", exclude=None):
     """
-    Ask Claude to generate a fresh POV-style hook + engagement question.
+    Ask Claude to generate a fresh hook + engagement question.
+    Uses varied formats — POV capped at 2 per week per weekly analysis.
     Returns (hook, engagement) or None on failure.
     """
     try:
@@ -1213,19 +1226,38 @@ def generate_ai_hook(bucket="community", exclude=None):
             "travel":     "travel experiences with carrying luggage or parcels",
         }.get(bucket, "peer-to-peer parcel delivery")
 
-        # Route distribution hint
+        # Route distribution
         route_roll = random.random()
         if route_roll < 0.65:
-            audience = "UK-based Nigerians / West African diaspora sending home"
-            prefix_hint = "no prefix needed — NG/diaspora angle"
+            audience    = "UK-based Nigerians / West African diaspora sending home"
+            prefix_hint = "no prefix — NG/diaspora angle"
         elif route_roll < 0.85:
-            audience = "local UK courier users"
+            audience    = "local UK courier users"
             prefix_hint = "start with [UK]"
         else:
-            audience = "UK-to-Europe senders"
+            audience    = "UK-to-Europe senders"
             prefix_hint = "start with [EU]"
 
-        prompt = f"""You write viral TikTok hooks for BootHop — a peer-to-peer parcel delivery app used by UK/Nigeria diaspora.
+        # Enforce POV cap: max 2 per week
+        pov_this_week = _pov_used_this_week()
+        if pov_this_week >= 2:
+            pov_rule = "DO NOT use the POV: format — it has been used 2+ times this week already. Use a different format."
+        else:
+            pov_rule = f"POV: format is allowed (used {pov_this_week}/2 times this week)."
+
+        # Hook format menu — Claude picks the best fit
+        hook_formats = """
+HOOK FORMAT OPTIONS (pick the one that best fits the content):
+1. POV:  "POV: Your parcel arrived before you did ✈️"   — {pov_rule}
+2. Narrative:  "A nurse in London. Her mum's meds. Delivered in 24 hours. 💊"
+3. Fact/Stat:  "Same-day London to Lagos exists. Most people don't know it yet. 🌍"
+4. Statement:  "Someone is already flying to Lagos tomorrow with 5kg of space. 🧳"
+5. Story open: "She packed 3 extra kilos of Jollof. He paid £0 to carry it. 😂"
+6. Challenge:  "Name a faster way to get a parcel to Lagos. We'll wait. ⏱️"
+7. Question:   "What if your parcel arrived before you did? 👀"
+""".format(pov_rule=pov_rule)
+
+        prompt = f"""You write viral TikTok/Instagram Reels hooks for BootHop — a peer-to-peer parcel delivery app used by UK/Nigeria diaspora.
 
 Context:
 - Bucket: {bucket} ({bucket_ctx})
@@ -1233,18 +1265,16 @@ Context:
 - Target audience: {audience}
 - Prefix rule: {prefix_hint}
 
-Generate ONE scroll-stopping POV-style hook under 12 words.
-Format: "POV: [situation] [1 emoji]"
-Examples: "POV: Your parcel made it before you did ✈️"  /  "POV: The courier knew your mum before you did 😭"
+{hook_formats}
 
-Also generate ONE short engagement question (under 10 words) to put at the end of the caption.
-Example: "Have you ever had a package arrive late? 👇"
+Generate ONE scroll-stopping hook under 12 words. Must be emotional, specific, vivid — NOT generic logistics copy.
+Do NOT include the word "BootHop" in the hook.
 
-Rules:
-- Hook must be emotional, specific, vivid — not generic logistics copy
-- Do NOT use the word "BootHop" in the hook
-- Engagement question must invite comments
-- Exclude these hooks (already used today): {"; ".join(exclude[:5]) if exclude else "none"}
+Also generate ONE short engagement question (under 10 words) to end the caption with.
+The question must invite real comments — make it personal, relatable.
+Good: "Has your parcel ever arrived late? 👇"  Bad: "What do you think of our service?"
+
+Exclude these (already used): {"; ".join(exclude[:5]) if exclude else "none"}
 
 Return ONLY valid JSON: {{"hook":"...","engagement":"..."}}"""
 
